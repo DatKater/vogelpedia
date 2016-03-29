@@ -7,4 +7,7 @@ Auf Go klicken und fertig. :>
 Jetzt wählt ihr mydb in der Leiste links aus. Dann wählt ihr den Tab "Operations" an, dort gibt es ein Feld "Rename database to".
 Gebt hier "vogelpedia" ein, drückt auf Go und fertig.
 
+Nun zum Nutzer. Klickt auf "Privileges" im Tab und dort dann auf "Add User".
+Hier gebt ihr als Username "vogelpedia_user" und als Passwort "1234" an. Speichern und fertig.
+
 Yöy.
