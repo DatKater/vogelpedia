@@ -8,6 +8,6 @@ Jetzt wählt ihr mydb in der Leiste links aus. Dann wählt ihr den Tab "Operatio
 Gebt hier "vogelpedia" ein, drückt auf Go und fertig.
 
 Nun zum Nutzer. Klickt auf "Privileges" im Tab und dort dann auf "Add User".
-Hier gebt ihr als Username "vogelpedia_user" und als Passwort "1234" an. Speichern und fertig.
+Hier gebt ihr als Username "vogelpedia_user" und als Passwort "1234" an und wählt Lokal als Host. Speichern und fertig.
 
 Yöy.
