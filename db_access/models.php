@@ -1,4 +1,6 @@
 <?php
+require_once 'settings/object.php';
+
 $dbname = 'vogelpedia';
 $host = 'localhost';
 $db_host = "mysql:host=$host;dbname=$dbname;charset=utf8";
@@ -8,38 +10,50 @@ $passwd = '1234';
 class Model{
     protected $db_table = '';
     protected $primary_key = '';
+    private $stns;
+    private $widgets;
+    private $columns;
+
+
+    function __construct() {
+        $this->stns = $GLOBALS['settings']['database'];
+        $this->widgets = $GLOBALS['settings']['widgets'];
+        $this->columns = $this->query_columns();
+    }
     
-//    function __construct() {
-//        
-//    }
     private function get_handler() {
-        $dbHandler = new PDO($GLOBALS['db_host'], $GLOBALS['user'], $GLOBALS['passwd']);
+        $stns = $this->stns;
+        $dbHandler = new PDO(sprintf('mysql:host=%s;dbname=%s;charset=utf8',
+                             $stns['database_host'], $stns['database_name']),
+                             $stns['user'], $stns['password']);
         return $dbHandler;
     }
     
-    public function get_columns() {
+    public function query_columns() {
         $dbHandler = $this->get_handler();
-        echo $this->db_table;
-        $query = sprintf('SELECT "COLUMN_NAME" FROM "INFORMATION_SCHEMA"."COLUMNS"
-                         WHERE "TABLE_SCHEMA"=%s AND "TABLE_NAME"=%s";', $GLOBALS['dbname'],
+        $query = sprintf('SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
+                         WHERE TABLE_SCHEMA="%s" AND TABLE_NAME="%s";', $GLOBALS['dbname'],
                          $this->db_table);
-        $query = "SELECT :column_name FROM :schema . :columns WHERE :t_schema = :db_name"
-                . " AND :t_name = :table";
         
         $stmt = $dbHandler->prepare($query);
-//        $stmt->execute(array(':column_name' => 'COLUMN_NAME', ':schema' => 'INFORMATION_SCHEMA',
-//                             ':columns' => 'COLUMNS', ':t_schema' => 'TABLE_SCHEMA',
-//                             ':db_name' => $GLOBALS['dbname'], ':t_name' => 'TABLE_NAME',
-//                             ':table' => $this->db_table));
+        $stmt->execute();
         $result = $stmt->fetchAll();
-        print_r($result);
-        print '<br>'.$query;
-        foreach($result as $res){
-            echo "$res <br>";
+        $processed = array();
+        foreach($result as $res) {
+            array_push($processed, array('name' => $res['COLUMN_NAME'],
+                                         'type' => $res['DATA_TYPE']));
         }
-        
+        print '<br>'.$query;
         $stmt->closeCursor();
-        return $result;
+        return $processed;
+    }
+    
+    public function get_columns() {
+        return $this->columns;
+    }
+    
+    public function get_form() {
+        
     }
     
     private function select_query($data, $cond) {
@@ -60,7 +74,7 @@ class Model{
     }
     
     public function create($data) {
-        $query = $this->create_query('INSERT INTO', $data);
+        $query = $this->insert_query($data);
         $dbHandler = $this->get_handler();
     }
     
