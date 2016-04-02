@@ -35,6 +35,11 @@ and open the template in the editor.
         </form>
         
         <?php
+        include_once '/db_access/models.php';
+        
+        $model = new BirdModel();
+        $model->get_columns();
+        
         require_once 'settings/object.php';
         print_r($settings);
         ?>
