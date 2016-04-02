@@ -48,7 +48,9 @@ class Model{
     }
     
     public function get_form() {
-        
+        foreach($this->columns as $col) {
+            include
+        }
     }
     
     private function select_query($data, $cond) {
