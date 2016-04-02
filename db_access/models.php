@@ -1,11 +1,6 @@
 <?php
 require_once 'settings/object.php';
 
-$dbname = 'vogelpedia';
-$host = 'localhost';
-$db_host = "mysql:host=$host;dbname=$dbname;charset=utf8";
-$user = 'vogelpedia_user';
-$passwd = '1234';
 
 class Model{
     protected $db_table = '';
