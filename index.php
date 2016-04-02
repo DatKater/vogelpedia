@@ -35,7 +35,8 @@ and open the template in the editor.
         </form>
         
         <?php
-        
+        require_once 'settings/object.php';
+        print_r($settings);
         ?>
     </body>
 </html>
