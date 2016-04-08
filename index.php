@@ -37,11 +37,13 @@ and open the template in the editor.
         <?php
         
         require_once 'settings/object.php';
-        print_r($settings);
-        include_once '/db_access/models.php';
+        require_once 'renderer/object.php';
+        require_once '/db_access/models.php';
         
+        $renderer = new TemplateRenderer();
         $model = new BirdModel();
-        print_r($model->get_columns());
+        echo($model->get_form());
+        echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
         ?>
         </pre>
     </body>

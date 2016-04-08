@@ -1,19 +1,29 @@
 <?php
 require_once 'settings/object.php';
+require_once 'renderer/object.php';
 
 
 class Model{
     protected $db_table = '';
     protected $primary_key = '';
     private $stns;
+    private $form_conf;
     private $widgets;
+    private $semantic_names;
     private $columns;
+    protected $exclude;
 
 
     function __construct() {
         $this->stns = $GLOBALS['settings']['database'];
         $this->widgets = $GLOBALS['settings']['widgets'];
+        $this->semantic_names = $GLOBALS['settings']['semantic_names'];
+        $this->form_conf = $GLOBALS['settings']['form'];
         $this->columns = $this->query_columns();
+    }
+    
+    private function quote($handler, $string) {
+        return substr($handler->quote($string), 1, -1);
     }
     
     private function get_handler() {
@@ -27,7 +37,7 @@ class Model{
     public function query_columns() {
         $dbHandler = $this->get_handler();
         $query = sprintf('SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
-                         WHERE TABLE_SCHEMA="%s" AND TABLE_NAME="%s";', $GLOBALS['dbname'],
+                         WHERE TABLE_SCHEMA="%s" AND TABLE_NAME="%s";', $this->stns['database_name'],
                          $this->db_table);
         
         $stmt = $dbHandler->prepare($query);
@@ -35,10 +45,15 @@ class Model{
         $result = $stmt->fetchAll();
         $processed = array();
         foreach($result as $res) {
-            array_push($processed, array('name' => $res['COLUMN_NAME'],
-                                         'type' => $res['DATA_TYPE']));
+            if(!in_array($res['COLUMN_NAME'], $this->exclude)){
+                array_push($processed, array('name' => $res['COLUMN_NAME'],
+                                             'type' => $res['DATA_TYPE'],
+                                             'semantic_name' => $this->semantic_names[$res['COLUMN_NAME']]));
+            } else {
+                
+            }
         }
-        print '<br>'.$query;
+        
         $stmt->closeCursor();
         return $processed;
     }
@@ -48,9 +63,26 @@ class Model{
     }
     
     public function get_form() {
+        $base_path = $this->form_conf['directory'];
+        $form = "";
+        $renderer = new TemplateRenderer();
         foreach($this->columns as $col) {
-            include
+            $name = $col['name'];
+            $type = $col['type'];
+            $semantic_name = $col['semantic_name'];
+            $value = '';
+            $widget = $this->widgets[$type];
+            $path = sprintf("%s/%s", $base_path, $widget);
+            $form .= '<p>'.$renderer->render($path, array('name' => $name,
+                                      'value' => $value, 'semantic_name' => $semantic_name)).'</p>';
         }
+        $form_template = $renderer->render($this->form_conf['base_template'],
+                                           array('form' => $form));
+        return $form_template;
+    }
+    
+    private function validate_input($column, $input) {
+        return true;
     }
     
     private function select_query($data, $cond) {
@@ -60,8 +92,23 @@ class Model{
         return $query;
     }
     
-    private function insert_query($data) {
-        $query = sprintf('INSERT %s INTO %s;', $data, $this->db_table);
+    public function insert_query($data) {
+        $dbhandler = $this->get_handler();
+        $cols = array();
+        $vals = array();
+        foreach($data as $key => $value) {
+            if($this->validate_input($key, $value)) {
+                array_push($cols, $key);
+                array_push($vals, '"'.$this->quote($dbhandler, $value).'"');
+            } else {
+                return false;
+            }
+        }
+        $cols = join(', ', $cols);
+        $vals = join(', ', $vals);
+        
+        $query = sprintf('INSERT INTO %s (%s) VALUES (%s);', $this->db_table,
+                         $cols, $vals);
         return $query;
     }
     
@@ -80,5 +127,6 @@ class Model{
 class BirdModel extends Model{
     protected $db_table = 'bird';
     protected $primary_key = 'idbird';
+    protected $exclude = array('idbird', 'image_path');
 }
 ?>
