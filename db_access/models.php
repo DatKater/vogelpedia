@@ -1,26 +1,32 @@
 <?php
-require_once 'settings/object.php';
-require_once 'renderer/object.php';
+require_once 'settings/object.php'; // Einstellungen
+require_once 'renderer/object.php'; // Template Renderer
 
 
 class Model{
-    protected $db_table = '';
-    protected $primary_key = '';
-    private $stns;
-    private $form_conf;
-    private $widgets;
-    private $semantic_names;
-    private $columns;
-    protected $exclude;
-    protected $foreign_keys;
-    protected $many_to_many;
+    protected $db_table = ''; // Die Datenbank-Tabelle, die genutzt wird
+    protected $primary_key = ''; // Der Primaerschluessel der Tabelle
+    
+    // Einstellungen, die aus der settings.ini geladen wurden
+    private $stns; // Datenbank
+    private $form_conf; // Fuer Formulare, z.B. Pfad zu den Widgets
+    private $widgets; // Aus welchen Dateien die Widgets geladen werden sollen
+    private $semantic_names; // Lesbare Namen fuer die Labels -> "Name in Latein" statt "name_latin"
+    private $columns; // Array in das die Spalten der Tabelle sowie Zusatzinfos (lesbarer Name, Datentyp der Spalte) gespeichert werden
+    protected $exclude; // Spalten in der Tabelle, die fuer das Formular ignoriert werden sollen (ForeignKey)
+    protected $foreign_keys; // Array, das Spalten fuer FKs sowie deren Tabelle+PK enthaelt
+    protected $many_to_many; // Array, enthaelt M2M Tabelle sowie verbundene Tabellen und PKs
 
 
     function __construct() {
+        
+        // Einstellungen aus der INI werden in Variabeln gespeichert
         $this->stns = $GLOBALS['settings']['database'];
         $this->widgets = $GLOBALS['settings']['widgets'];
         $this->semantic_names = $GLOBALS['settings']['semantic_names'];
         $this->form_conf = $GLOBALS['settings']['form'];
+        
+        // Spalten der DB abfragen und verarbeiten lassen (siehe query_columns)
         $this->columns = $this->query_columns();
     }
     
@@ -29,55 +35,61 @@ class Model{
     }
     
     private function get_handler() {
-        $stns = $this->stns;
+        // Per PDO eine Verbindung zur DB herstellen mit den Einstellungen aus der INI und die Verbindung zurueckgeben
         $dbHandler = new PDO(sprintf('mysql:host=%s;dbname=%s;charset=utf8',
-                             $stns['database_host'], $stns['database_name']),
-                             $stns['user'], $stns['password']);
+                             $this->stns['database_host'], $this->stns['database_name']),
+                             $this->stns['user'], $this->stns['password']);
         return $dbHandler;
     }
     
     public function query_columns() {
-        $dbHandler = $this->get_handler();
+        $dbHandler = $this->get_handler(); // DB-Verbindung herstellen
+        
+        // SQL Statement: Datentyp und Spaltenname aller Spalten in der eigenen Tabelle erhalten
         $query = sprintf('SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
                          WHERE TABLE_SCHEMA="%s" AND TABLE_NAME="%s";', $this->stns['database_name'],
                          $this->db_table);
         
-        $stmt = $dbHandler->prepare($query);
-        $stmt->execute();
-        $result = $stmt->fetchAll();
-        $processed = array();
+        $stmt = $dbHandler->prepare($query); // Abfrage vorbereiten
+        $stmt->execute(); // ausfuehren
+        $result = $stmt->fetchAll(); // Ergebnisse
+        $processed = array(); // Resultat, wird zurueckgegeben und in die private $columns Spalte geschrieben
+        
         foreach($result as $res) {
+            // Wenn der Spaltenname nicht in exclude steht, also nicht ignoriert werden soll
             if(!in_array($res['COLUMN_NAME'], $this->exclude)){
+                // Fuege die Spalte, ihren Datentyp und den lesbaren Namen zum Resultat hinzu
                 array_push($processed, array('name' => $res['COLUMN_NAME'],
                                              'type' => $res['DATA_TYPE'],
                                              'semantic_name' => $this->semantic_names[$res['COLUMN_NAME']]));
-            } else {
-                
             }
         }
         
-        $stmt->closeCursor();
-        return $processed;
+        $stmt->closeCursor(); // Verbindung schliessen
+        return $processed; // Resultat zurueckgeben
     }
     
     public function get_columns() {
-        return $this->columns;
+        return $this->columns; // Um auf $columns zugreifen zu koennen, da private Variable
     }
     
     public function get_form() {
-        $base_path = $this->form_conf['directory'];
-        $form = "";
-        $renderer = new TemplateRenderer();
-        foreach($this->columns as $col) {
-            $name = $col['name'];
-            $type = $col['type'];
-            $semantic_name = $col['semantic_name'];
-            $value = '';
-            $widget = $this->widgets[$type];
-            $path = sprintf("%s/%s", $base_path, $widget);
+        $base_path = $this->form_conf['directory']; // Der Pfad/Ordner, in dem die Widget-Templates liegen
+        $form = ""; // Wird HTML-Code fuer das Formular beinhalten
+        $renderer = new TemplateRenderer(); // Parser fuer die Templates, siehe renderer/object.php
+        foreach($this->columns as $col) { // Fuer jede Spalte
+            $name = $col['name']; // Spaltenname
+            $type = $col['type']; // Datentyp der Spalte
+            $semantic_name = $col['semantic_name']; // lesbarer Name fuer die Spalte
+            $value = ''; // In der Spalte gespeicherter Wert, hier immer leer, da hinzugefuegt wird, nicht bearbeitet
+            $widget = $this->widgets[$type]; // Das Widgettemplate (z.B. text.php) wird passend dem Datentyp ausgewaehlt
+            $path = $base_path.'/'.$widget; // Der Pfad zum Widgettemplate
+            // Das Widget wird gerendert, die Platzhalter werden durch die Werte ersetzt, siehe renderer/object.php
             $form .= '<p>'.$renderer->render($path, array('name' => $name,
                                       'value' => $value, 'semantic_name' => $semantic_name)).'</p>';
+            
         }
+        // Die gerenderten Widgets werden in das Template eingesetzt, liefert Submit/Reset Buttons etc.
         $form_template = $renderer->render($this->form_conf['base_template'],
                                            array('form' => $form));
         return $form_template;
@@ -95,23 +107,26 @@ class Model{
     }
     
     public function insert_query($data) {
-        $dbhandler = $this->get_handler();
-        $cols = array();
-        $vals = array();
+        $dbhandler = $this->get_handler(); // DB-Verbindung herstellen
+        $cols = array(); // Array fuer alle Spaltennamen
+        $vals = array(); // Array fuer alle Werte
+        // Durch den Nutzerinput
         foreach($data as $key => $value) {
+            // Wenn der Nutzerinput nicht ungueltig ist, sonst abbrechen
             if($this->validate_input($key, $value)) {
-                array_push($cols, $key);
-                array_push($vals, '"'.$this->quote($dbhandler, $value).'"');
+                array_push($cols, $key); // Die Spalte
+                array_push($vals, '"'.$this->quote($dbhandler, $value).'"'); // wird vom Wert getrennt
             } else {
                 return false;
             }
         }
-        $cols = join(', ', $cols);
-        $vals = join(', ', $vals);
+        $cols = join(', ', $cols); // Alles zusammenfuegen, damit SQL akzeptiert
+        $vals = join(', ', $vals); // Hier auch
         
+        // INSERT Statement vorbereiten
         $query = sprintf('INSERT INTO %s (%s) VALUES (%s);', $this->db_table,
                          $cols, $vals);
-        return $query;
+        return $query; // Statement zurueckgeben
     }
     
     public function get_object_by_pk($pk) {
@@ -126,17 +141,20 @@ class Model{
     
 }
 
+// Model fuer die bird-Tabelle, also die Voegel
 class BirdModel extends Model{
     protected $db_table = 'bird';
     protected $primary_key = 'idbird';
     protected $exclude = array('idbird', 'image_path');
     protected $foreign_keys = array(
-        array('col' => '', 'pk' => ''),
+        array('col' => '', 'fk_table' => '', 'fk_pk' => ''),
     );
 }
 
+// Model fuer die breeding_place-Tabelle, also den Brutort
 class BreedingPlaceModel extends Model {
-    protected $dbtable = 'breeding_place';
-    protected $primary_key = 'id';
+    protected $db_table = 'breeding_place';
+    protected $primary_key = 'idbreeding_place';
+    protected $exclude = array('idbreeding_place', );
 }
 ?>

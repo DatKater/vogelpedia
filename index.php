@@ -21,31 +21,21 @@ and open the template in the editor.
         </nav>
         </header>
         <h1>Vogelpedia</h1>
-        <form action="" method="">
-            <label for="Vogelname">Vogelname: </label><input type="text" name="Vogelname" value="" size="30" maxlength="50"> <br>
-            <label for="familie">Vogelfamilie: </label><select name="familie"><option value="meisen">Meisen</option><option value="finken">Finken</option></select> <br>
-            <label for="gebirge">Lebensraum: </label><select name="lebenraum"><option value="gebirge">Gebirge</option><option value="feuchtgebiete">Feuchtgebiete</option><option value="wald">Wald</option></select> <br>
-            <label for="color">Farbe: </label><select name="color"><option value="gelb">Gelb</option><option value="gruen">Grün</option><option name="schwarz">Schwarz</option></select> <br>
-            <label for="nahrung">Nahrung: </label><select name="nahrung"><option value="Kaefer">Käfer</option><option value="Wuermer">Würmer</option><option value="Bienen">Bienen</option></select> <br>
-            <label for="Brutort">Brutort: </label><select name="Brutort"><option value="Boden">Boden</option><option value="Baumhoehle">Baumhöhle</option><option value="Busch">Busch</option></select><br>
-            <input type="submit"><input type="reset">
-            
-        
-        
-        </form>
-        <pre>
         <?php
         
         require_once 'settings/object.php';
         require_once 'renderer/object.php';
         require_once '/db_access/models.php';
         
+        // Tests
         $renderer = new TemplateRenderer();
         $model = new BirdModel();
+        $scnd = new BreedingPlaceModel();
         echo($model->get_form());
+        echo($scnd->get_form());
         echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
+        echo($scnd->insert_query(array('idbreeding_place'=>1, 'name'=>'Horst')));
         
         ?>
-        </pre>
     </body>
 </html>
