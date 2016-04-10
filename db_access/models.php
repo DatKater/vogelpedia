@@ -12,6 +12,8 @@ class Model{
     private $semantic_names;
     private $columns;
     protected $exclude;
+    protected $foreign_keys;
+    protected $many_to_many;
 
 
     function __construct() {
@@ -128,5 +130,13 @@ class BirdModel extends Model{
     protected $db_table = 'bird';
     protected $primary_key = 'idbird';
     protected $exclude = array('idbird', 'image_path');
+    protected $foreign_keys = array(
+        array('col' => '', 'pk' => ''),
+    );
+}
+
+class BreedingPlaceModel extends Model {
+    protected $dbtable = 'breeding_place';
+    protected $primary_key = 'id';
 }
 ?>

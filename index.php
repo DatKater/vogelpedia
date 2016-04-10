@@ -44,6 +44,7 @@ and open the template in the editor.
         $model = new BirdModel();
         echo($model->get_form());
         echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
+        
         ?>
         </pre>
     </body>
