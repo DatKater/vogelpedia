@@ -31,7 +31,7 @@ class Instance {
         $this->values = $values;
     }
     
-    public function get_values($key) {
+    public function get_values() {
         return $this->values;
     }
     
