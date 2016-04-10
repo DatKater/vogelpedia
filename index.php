@@ -21,6 +21,7 @@ and open the template in the editor.
         </nav>
         </header>
         <h1>Vogelpedia</h1>
+        <pre>
         <?php
         
         require_once 'settings/object.php';
@@ -31,11 +32,13 @@ and open the template in the editor.
         $renderer = new TemplateRenderer();
         $model = new BirdModel();
         $scnd = new BreedingPlaceModel();
-        echo($model->get_form());
+        echo($model->get_form(array('name' => 'Specht', 'breeding_duration' => 12)));
         echo($scnd->get_form());
         echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
         echo($scnd->insert_query(array('idbreeding_place'=>1, 'name'=>'Horst')));
+        print_r($model->get_objects()[0]->get_values());
         
         ?>
+        </pre>
     </body>
 </html>

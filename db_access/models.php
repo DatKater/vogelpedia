@@ -3,9 +3,52 @@ require_once 'settings/object.php'; // Einstellungen
 require_once 'renderer/object.php'; // Template Renderer
 
 
+class Relation {
+    public $column;
+    public $fk_model;
+    
+    public function __construct($column, $fk_model) {
+        $this->column = $column;
+        $this->fk_model = $fk_model;
+    }
+    
+    public function get_widget(){
+        $renderer = new TemplateRenderer();
+        $fk_objects = $this->fk_model->get_objects();
+    }
+}
+
+class M2MRelation {
+    
+}
+
+
+class Instance {
+    protected $primary_key;
+    protected $values;
+    
+    public function __construct($values) {
+        $this->values = $values;
+    }
+    
+    public function get_values($key) {
+        return $this->values;
+    }
+    
+    public function get_value($key) {
+        return $this->values[$key];
+    }
+    
+    public function __toString() {
+        return '';
+    }
+}
+
+
 class Model{
     protected $db_table = ''; // Die Datenbank-Tabelle, die genutzt wird
     protected $primary_key = ''; // Der Primaerschluessel der Tabelle
+    protected $instance; // Abfragen werden als Instanz dieser Klasse zurueckgegeben
     
     // Einstellungen, die aus der settings.ini geladen wurden
     private $stns; // Datenbank
@@ -18,7 +61,7 @@ class Model{
     protected $many_to_many; // Array, enthaelt M2M Tabelle sowie verbundene Tabellen und PKs
 
 
-    function __construct() {
+    public function __construct() {
         
         // Einstellungen aus der INI werden in Variabeln gespeichert
         $this->stns = $GLOBALS['settings']['database'];
@@ -28,6 +71,10 @@ class Model{
         
         // Spalten der DB abfragen und verarbeiten lassen (siehe query_columns)
         $this->columns = $this->query_columns();
+    }
+    
+    public function as_str(){
+        return '';
     }
     
     private function quote($handler, $string) {
@@ -73,7 +120,7 @@ class Model{
         return $this->columns; // Um auf $columns zugreifen zu koennen, da private Variable
     }
     
-    public function get_form() {
+    public function get_form($data=NULL) {
         $base_path = $this->form_conf['directory']; // Der Pfad/Ordner, in dem die Widget-Templates liegen
         $form = ""; // Wird HTML-Code fuer das Formular beinhalten
         $renderer = new TemplateRenderer(); // Parser fuer die Templates, siehe renderer/object.php
@@ -81,7 +128,7 @@ class Model{
             $name = $col['name']; // Spaltenname
             $type = $col['type']; // Datentyp der Spalte
             $semantic_name = $col['semantic_name']; // lesbarer Name fuer die Spalte
-            $value = ''; // In der Spalte gespeicherter Wert, hier immer leer, da hinzugefuegt wird, nicht bearbeitet
+            $value = (!empty($data[$name])) ? $data[$name] : ''; // In der Spalte gespeicherter Wert, 
             $widget = $this->widgets[$type]; // Das Widgettemplate (z.B. text.php) wird passend dem Datentyp ausgewaehlt
             $path = $base_path.'/'.$widget; // Der Pfad zum Widgettemplate
             // Das Widget wird gerendert, die Platzhalter werden durch die Werte ersetzt, siehe renderer/object.php
@@ -134,6 +181,20 @@ class Model{
         $dbHandler = $this->get_handler();
     }
     
+    public function get_objects() {
+        $query = 'SELECT * FROM '.$this->db_table.';';
+        $dbHandler = $this->get_handler();
+        $stmt = $dbHandler->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetchAll();
+        $queryset = array();
+        print_r($result);
+        foreach($result as $res){
+            array_push($queryset, new $this->instance($res));
+        }
+        return $queryset;
+    }
+    
     public function create($data) {
         $query = $this->insert_query($data);
         $dbHandler = $this->get_handler();
@@ -141,13 +202,25 @@ class Model{
     
 }
 
+
+class BirdInstance extends Instance {
+    protected $primary_key = 'idbird';
+    
+    public function __toString() {
+        return $this->values['name'].' mit PK: '.$this->values[$this->primary_key];
+    }
+}
+
+
 // Model fuer die bird-Tabelle, also die Voegel
 class BirdModel extends Model{
     protected $db_table = 'bird';
     protected $primary_key = 'idbird';
-    protected $exclude = array('idbird', 'image_path');
+    protected $instance = BirdInstance;
+    protected $exclude = array('idbird', 'image_path', 'family_idfamily', 'breeding_place_idbreeding_place');
     protected $foreign_keys = array(
-        array('col' => '', 'fk_table' => '', 'fk_pk' => ''),
+        array('col' => 'family_idfamily', 'fk_table' => 'family', 'fk_pk' => 'idfamily'),
+        array('col' => 'breeding_place_idbreeding_place', 'fk_table' => 'breeding_place', 'fk_pk' => 'idbreeding_place'),
     );
 }
 
@@ -156,5 +229,10 @@ class BreedingPlaceModel extends Model {
     protected $db_table = 'breeding_place';
     protected $primary_key = 'idbreeding_place';
     protected $exclude = array('idbreeding_place', );
+}
+
+
+class FamilyModel extends Model {
+    
 }
 ?>
