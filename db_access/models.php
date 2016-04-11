@@ -9,12 +9,17 @@ class Relation {
     
     public function __construct($column, $fk_model) {
         $this->column = $column;
-        $this->fk_model = $fk_model;
+        $this->fk_model = new $fk_model();
+        
+        $this->get_widget();
     }
     
     public function get_widget(){
         $renderer = new TemplateRenderer();
         $fk_objects = $this->fk_model->get_objects();
+        foreach($fk_objects as $key => $value) {
+            echo $key, $value;
+        }
     }
 }
 
@@ -218,10 +223,15 @@ class BirdModel extends Model{
     protected $primary_key = 'idbird';
     protected $instance = BirdInstance;
     protected $exclude = array('idbird', 'image_path', 'family_idfamily', 'breeding_place_idbreeding_place');
-    protected $foreign_keys = array(
-        array('col' => 'family_idfamily', 'fk_table' => 'family', 'fk_pk' => 'idfamily'),
-        array('col' => 'breeding_place_idbreeding_place', 'fk_table' => 'breeding_place', 'fk_pk' => 'idbreeding_place'),
-    );
+    
+    public function __construct() {
+        parent::__construct();
+        $this->foreign_keys = array(
+            new Relation('family_idfamily', FamilyModel),
+            new Relation('breeding_place_idbreeding_place', BreedingPlaceModel),
+        );
+        print_r($this->foreign_keys);
+    }
 }
 
 // Model fuer die breeding_place-Tabelle, also den Brutort
@@ -233,6 +243,8 @@ class BreedingPlaceModel extends Model {
 
 
 class FamilyModel extends Model {
+    protected $db_table = 'family';
+    protected $primary_key = 'familyid';
     
 }
 ?>
