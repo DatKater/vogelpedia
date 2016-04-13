@@ -7,46 +7,29 @@
         <form method='post'>
             <?php
                 require_once('settings/object.php');
-                function prepare_bound_variables($array) {
-                    $new = array();
-                    foreach($array as $key => $var) {
-                        $new[':'.$key] = $var;
-                    }
-                    return $new;
-                }
+                require_once('functions.php');
+                require_once('renderer/object.php');
+                $dbHandler = get_handler();
+                $renderer = new TemplateRenderer();
                 
-                function get_values_from_db($handler, $table){
-                    $query = sprintf('SELECT * FROM %s;', $table);
-                    $stmt = $handler->prepare($query);
-                    $stmt->execute();
-                    $keys = $stmt->fetchAll();
-                    $stmt->closeCursor();
-                    echo $query;
-                    
-                    return $keys;
+                function get_select_fk(){
+                    $select = "<p><label for=''>%s</label></p>";
                 }
-                
-                $dbHandler = new PDO(sprintf('mysql:host=%s;dbname=%s;charset=utf8',
-                     $settings['database']['database_host'], $settings['database']['database_name']),
-                     $settings['database']['user'], $settings['database']['password']);
                 
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $bound_variables = prepare_bound_variables($_POST);
                     $bound = join(', ', array_keys($bound_variables));
                     $columns = join(', ', array_keys($_POST));
-
+                    
                     $query = 'INSERT INTO bird (%s) VALUES (%s);';
                     $query = sprintf($query, $columns, $bound);
 
                     $stmt = $dbHandler->prepare($query);
-                    print_r($bound_variables);
-                    print_r($stmt);
                     $stmt->execute($bound_variables);
                     $stmt->closeCursor();
                 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     $family_keys = get_values_from_db($dbHandler, 'family');
                     $breeding_place_keys = get_values_from_db($dbHandler, 'breeding_place');
-                    
                 }
                 
             ?>
@@ -59,26 +42,30 @@
             <p><label for='life_expectancy'>Lebenserwartung:</label><input type='number' id='life_expectancy' name='life_expectancy'></p>
             <p><label for='breeding_duration'>Brutdauer:</label><input type='number' id='breeding_duration' name='breeding_duration'></p>
             <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list'></p>
+            
+            <?php
+//                echo $renderer->render('widgets/foreign_key.html', array('id' => 'family',
+//                    'name' => 'family_idfamily', 'verbose_name' => 'Familie',
+//                    'array' => $family_keys, 'fk_id' => 'idbird', 'fk_name' => 'name'));
+//                print_r($family_keys);
+            ?>
+            
             <p><label for='family'>Familie:</label><select id='family' type="number" name='family_idfamily'>
             <?php
-                $options = '';
-                foreach($family_keys as $key){
-                    $options .= sprintf('<option value="%s">%s</option>', $key['idbird'], $key['name']);
-                }
-                echo $options;
+                echo print_select_options($family_keys, 'idbird', 'name');
             ?>
             </select></p>
+            
             <p><label for='breeding_place'>Brutort:</label><select id='breeding_place' type="number" name='breeding_place_idbreeding_place'>
             <?php
-                $options = '';
-                foreach($breeding_place_keys as $key){
-                    $options .= sprintf('<option value="%s">%s</option>', $key['idbreeding_place'], $key['name']);
-                }
-                echo $options;
+                echo print_select_options($breeding_place_keys, 'idbreeding_place', 'name');
             ?>
             </select></p>
             
             <p><input type='submit' value='Absenden'><input type='reset' value='Zurücksetzen'></p>
+            <?php
+                echo $renderer->render('widgets/foreign_key.html', array('array' => $breeding_place_keys, 'id' => 'idbreeding_place', 'name' => 'name'));
+            ?>
         </form>
     </fieldset>
 <?php include 'parts/footer.php' ?>

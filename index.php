@@ -18,13 +18,15 @@ and open the template in the editor.
         
         // Tests
         $renderer = new TemplateRenderer();
-        $model = new BirdModel();
-        $scnd = new BreedingPlaceModel();
-        echo($model->get_form(array('name' => 'Specht', 'breeding_duration' => 12)));
-        echo($scnd->get_form());
-        echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
-        echo($scnd->insert_query(array('idbreeding_place'=>1, 'name'=>'Horst')));
-        print_r($model->get_objects()[0]->get_values());
+        
+        echo($renderer->render('widgets/foreign_key.html', array('breeding_place_keys' => array())));
+//        $model = new BirdModel();
+//        $scnd = new BreedingPlaceModel();
+//        echo($model->get_form(array('name' => 'Specht', 'breeding_duration' => 12)));
+//        echo($scnd->get_form());
+//        echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
+//        echo($scnd->insert_query(array('idbreeding_place'=>1, 'name'=>'Horst')));
+//        print_r($model->get_objects()[0]->get_values());
         
         ?>
         </pre>
