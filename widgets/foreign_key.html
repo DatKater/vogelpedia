@@ -1,6 +1,6 @@
 <p>
 <label for='{ id }'>{ verbose_name }</label>
-<select id='{ id }' name='{ name }'>
+<select id='{ id }' name='{ name }' { multiple }>
     {% print_select_options array fk_id fk_name %}
 </select>
 </p>
