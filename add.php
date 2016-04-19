@@ -10,28 +10,29 @@
                 require_once('functions.php');
                 require_once('renderer/object.php');
                 
-                $dbHandler = get_handler();
-                $renderer = new TemplateRenderer();
+                $dbHandler = get_handler(); // PDO, siehe functions.php
+                $renderer = new TemplateRenderer(); // Template Renderer, siehe renderer/objects.php
                 
-                if(isset($_POST['debug'])) {
-                    $debug = $_POST['debug'];
-                    unset($_POST['debug']);
+                if(isset($_POST['debug'])) { // Wenn Debug angewaehlt
+                    $debug = $_POST['debug']; // $debug ist gesetzt
+                    unset($_POST['debug']); // Aus POST entfernen
                 } else {
-                    $debug = NULL;
+                    $debug = NULL; // Ansonsten ist Debug nicht gesetzt
                 }
                 
+                // Array mit allen M2M-Relationenen
                 $m2m = array(
-                    'bird_has_color' => array(
-                        'fk_id' => 'idcolor',
-                        'id' => 'idbird',
+                    'bird_has_color' => array( // Tabellenname der Relation dient als Key
+                        'fk_id' => 'color_idcolor', // 
+                        'id' => 'bird_idbird',
                     ),
                     'bird_has_food' => array(
-                        'fk_id' => 'idfood',
-                        'id' => 'idbird',
+                        'fk_id' => 'food_idfood',
+                        'id' => 'bird_idbird',
                     ),
                     'bird_has_habitat' => array(
-                        'fk_id' => 'idhabitat',
-                        'id' => 'idbird',
+                        'fk_id' => 'habitat_idhabitat',
+                        'id' => 'bird_idbird',
                     ),
                 );
                 
@@ -49,9 +50,9 @@
                     if(!$debug){
                         $stmt = $dbHandler->prepare($query);
                         $stmt->execute($bound_variables);
-                        $stmt->closeCursor();
                         
                         $id = $dbHandler->lastInsertId();
+                        $stmt->closeCursor();
                         echo '<br> ID',$id,'</br>';
                         handle_m2m($m2m_rel, $id, $dbHandler);
                         

@@ -47,17 +47,19 @@ function split_m2m($m2m, $post){
 
 function handle_m2m($m2m, $id, $handler) {
     foreach($m2m as $table => $array) {
+        print_r($m2m);
         $fk_id_name = $array['fk_id'];
         $id_name = $array['id'];
         $values = $array['value'];
         
-        $query = sprintf("INSERT INTO %s (%s, %s) VALUES (:fk_id, '%s')", $table, $fk_id_name, $id_name, $id);
-        $stmt = $handler->prepare($query);
+        $query = sprintf("INSERT INTO %s (%s, %s) VALUES (:fk_id, '%s');", $table, $fk_id_name, $id_name, $id);
         
         echo $query;
         print_r($values);
         
-        foreach($values as $val) {
+        foreach($values as $val) { 
+            echo '<br>WERT:'.$val.'</br>';
+            $stmt = $handler->prepare($query);
             $stmt->bindParam(':fk_id', $val);
             $stmt->execute();
         }
