@@ -1,6 +1,7 @@
 <?php 
 require_once('settings/object.php');
 
+// Erstellt ein PDO Objekt mit den Angaben, die es aus der settings.ini Datei erhaelt (diese wurden in das $settings Array geschrieben
 function get_handler() {
     global $settings;
     return new PDO(sprintf('mysql:host=%s;dbname=%s;charset=utf8',
@@ -8,62 +9,67 @@ function get_handler() {
                    $settings['database']['user'], $settings['database']['password']);
 }
 
+// Erstellt aus den Angaben in POST ein Array mit Doppelpunkt am Anfang des Keys, damit daraus dann prepared Statements erstellt werden
 function prepare_bound_variables($array) {
-    $new = array();
-    foreach($array as $key => $var) {
-        $new[':'.$key] = $var;
+    $new = array(); // Rueckgabe
+    foreach($array as $key => $var) { // Jeden Key im Array (z.B. $_POST)
+        $new[':'.$key] = $var; // Fuege dem neuen Array :key = value hinzu, z.B. statt [name] = Amsel --> [:name] = Amsel
     }
-    return $new;
+    return $new; // Rueckgabe
 }
 
+// Gibt alle Werte aus einer Tabelle zurueck
 function get_values_from_db($handler, $table){
-    $query = sprintf('SELECT * FROM %s;', $table);
-    $stmt = $handler->prepare($query);
-    $stmt->execute();
-    $keys = $stmt->fetchAll();
-    $stmt->closeCursor();
-    echo $query;
+    
+    $query = sprintf('SELECT * FROM %s;', $table); // z.B. SELECT * FROM bird;
+    $stmt = $handler->prepare($query); // Statement
+    $stmt->execute(); // ausfueren
+    $keys = $stmt->fetchAll(); // Alle Werte in ein Array
+    $stmt->closeCursor(); // Verbindung schliessen
 
-    return $keys;
+    return $keys; // Rueckgabe
 }
 
+// Erstellt <option> Argumente fuer die FK/M2M-Widgets
 function print_select_options($array, $id, $name) {
-    $options = '';
-    foreach($array as $key){
-        $options .= sprintf('<option value="%s">%s</option>', $key[$id], $key[$name]);
+    $options = ''; // Rueckgabestring
+    foreach($array as $key){ // Jedes Argument
+        $options .= sprintf('<option value="%s">%s</option>', $key[$id], $key[$name]); // z.B. <option value="2">Spechte</option>
     }
-    return $options;
+    return $options; // String zurueckgeben
 }
 
+// M2M Angaben von normalen Angaben trennen (da diese in eine andere Tabelle kommen)
 function split_m2m($m2m, $post){
-    foreach($m2m as $key => $val){
-        if(isset($post[$key])){
-            $m2m[$key]['value'] = $post[$key];
+    // $m2m ist ein Array, in dem alle Angaben zu den Relationen stehen
+    foreach($m2m as $key => $val){ // $key ist der Tabellenname der Relation, $val ein Array mit relevanten Infos zur Relation
+        if(isset($post[$key])){ // Wenn der Tabellenname in POST steht, der Nutzer also etwas angegeben hat
+            $m2m[$key]['value'] = $post[$key]; // Fuege den Informationen zur Relation die Werte, die der Nutzer angegeben hat hinzu
         }
-        unset($post[$key]);
+        unset($post[$key]); // Entferne die Angabe aus dem $post
     }
-    return array($post, $m2m);
+    return array($post, $m2m); // Gebe beides wieder zurueck
 }
 
+// M2M Relationen werden in der Datenbank gespeichert
 function handle_m2m($m2m, $id, $handler) {
-    foreach($m2m as $table => $array) {
+    foreach($m2m as $table => $array) { // $table ist der Name der Tabelle der Relation, $array ein Array mit Informationen
         print_r($m2m);
-        $fk_id_name = $array['fk_id'];
-        $id_name = $array['id'];
-        $values = $array['value'];
+        $fk_id_name = $array['fk_id']; // Der Name der Spalte mit dem Fremdschluessel
+        $id_name = $array['id']; // Der Name der Spalte mit dem eigenen Schluessel
+        $values = $array['value']; // Die Werte, die in die Tabelle eingefuegt werden sollen
         
+        // Beispiel: INSERT INTO bird_has_food (food_idfood, bird_idbird) VALUES (1, 1);
         $query = sprintf("INSERT INTO %s (%s, %s) VALUES (:fk_id, '%s');", $table, $fk_id_name, $id_name, $id);
         
-        echo $query;
-        print_r($values);
-        
-        foreach($values as $val) { 
+        foreach($values as $val) { // Fuer jeden Wert des Nutzers
             echo '<br>WERT:'.$val.'</br>';
-            $stmt = $handler->prepare($query);
-            $stmt->bindParam(':fk_id', $val);
-            $stmt->execute();
+            $stmt = $handler->prepare($query); // Statement erstellen
+            $stmt->bindParam(':fk_id', $val); // Den einzelnen Wert in die Query einsetzen
+            $stmt->execute(); // ausfuehren
+            $stmt->closeCursor(); // Statement schliessen
         }
-        $stmt->closeCursor();
+        
         
     }
 }
