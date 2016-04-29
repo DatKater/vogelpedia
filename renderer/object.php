@@ -16,6 +16,14 @@ class TemplateRenderer {
             if(!is_array($value)){
                 $pattern = $this->left_delimiter.'(\s)?'.$key.'(\s)?'. $this->right_delimiter; // RegEx, z.B.: {(\s)?name(\s)?} --> {name} bzw. { name }
                 $file = mb_ereg_replace($pattern, $value, $file); // RegEx-Suche, alle Platzhalter durch den jeweiligen Wert ersetzen
+            } else {
+                $pattern = '('.$this->left_delimiter.'(\s)?(?P<name>'.$key.')\.(?P<value>[\w]+)(\s)?'.$this->right_delimiter.')';
+                $matches = array();
+                preg_match_all($pattern, $file, $matches, PREG_SET_ORDER);
+                foreach($matches as $match) {
+                    $key = $match['value'];
+                    $file = mb_ereg_replace($match[0], $value[$key], $file);
+                }
             }
         }
         

@@ -30,6 +30,18 @@ function get_values_from_db($handler, $table){
     return $keys; // Rueckgabe
 }
 
+
+function get_single_value_from_db($handler, $table, $value) {
+    $query = sprintf('SELECT %s FROM %s;', $value, $table); // z.B. SELECT idbird FROM bird;
+    $stmt = $handler->prepare($query); // Statement
+    $stmt->execute(); // ausfueren
+    $keys = $stmt->fetchAll(); // Alle Werte in ein Array
+    $stmt->closeCursor(); // Verbindung schliessen
+
+    return $keys; // Rueckgabe
+}
+
+
 // Erstellt <option> Argumente fuer die FK/M2M-Widgets
 function print_select_options($array, $id, $name) {
     $options = ''; // Rueckgabestring

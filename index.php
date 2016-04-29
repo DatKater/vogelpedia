@@ -9,27 +9,26 @@ and open the template in the editor.
     <body>
         <?php include 'parts/header.php' ?>
         <h1>Vogelpedia</h1>
-        <pre>
+        
         <?php
         
         require_once 'settings/object.php';
         require_once 'renderer/object.php';
         require_once '/db_access/models.php';
+        require_once 'functions.php';
         
-        // Tests
-        $renderer = new TemplateRenderer();
-        
-        echo($renderer->render('widgets/foreign_key.html', array('breeding_place_keys' => array())));
-//        $model = new BirdModel();
-//        $scnd = new BreedingPlaceModel();
-//        echo($model->get_form(array('name' => 'Specht', 'breeding_duration' => 12)));
-//        echo($scnd->get_form());
-//        echo($model->insert_query(array('idbird'=>1,'name'=>'Grünkohl')));
-//        echo($scnd->insert_query(array('idbreeding_place'=>1, 'name'=>'Horst')));
-//        print_r($model->get_objects()[0]->get_values());
-        
+        $query = 'SELECT * FROM bird;';
+        $dbHandler = get_handler();
+        $objects = get_single_value_from_db($dbHandler, 'bird', 'idbird, name');
         ?>
-        </pre>
+        
+        <ul>
+        <?php
+        foreach($objects as $object) {
+            echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].'</a></li>';
+        }
+        ?>
+        </ul>
         
         <?php include 'parts/footer.php' ?>
     </body>
