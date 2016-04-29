@@ -85,4 +85,47 @@ function handle_m2m($m2m, $id, $handler) {
         
     }
 }
+
+function form_value($name, $type='text', $select_value = ''){
+
+   if(isset($_GET[$name])){
+
+      switch($type){
+
+         case 'text':{
+            return ' value="'.htmlspecialchars($_GET[$name]).'" ';
+            break;
+         }
+
+         case 'textarea':{
+            return htmlspecialchars($_GET[$name]);
+            break;
+         }
+
+         case 'checkbox':{
+            return ' checked="checked" ';
+            break;
+         }
+
+         case 'radio':{
+             if($_GET[$name] == $select_value){
+               return ' checked="checked" ';
+            }
+            break;
+         }
+
+         case 'select':{
+            if($_GET[$name] == $select_value){
+               return ' selected="selected" ';
+            }
+            break;
+         }
+
+      }
+
+   }
+
+   return '';
+}
+
 ?>

@@ -4,30 +4,204 @@
 <?php include 'parts/header.php' ?>
     <fieldset>
         <legend>Vogel suchen</legend>
-        <form method='post'>
+        <form method='get'>
             <?php
+            
+            require_once('settings/object.php');
+            require_once('functions.php');
+            require_once('renderer/object.php');
+            
+            $dbHandler = get_handler();
+            $renderer = new TemplateRenderer();
+            
+            $query_templates = array(
+                'name' => array(
+                    'query' => 'name LIKE :name',
+                    'bound' => '%%%s%%',
+                ),
+                'name_latin' => array(
+                    'query' => 'name_latin LIKE :name_latin',
+                    'bound' => '%%%s%%',
+                ),
+                'description' => array(
+                    'query' => 'description LIKE :description',
+                    'bound' => '%%%s%%',
+                ),
+                'min_livestock' => array(
+                    'query' => 'min_livestock >= :min_livestock',
+                    'bound' => '%s',
+                ),
+                'max_livestock' => array(
+                    'query' => 'max_livestock <= :max_livestock',
+                    'bound' => '%s',
+                ),
+                'min_length' => array(
+                    'query' => 'min_length >= :min_length',
+                    'bound' => '%s',
+                ),
+                'max_length' => array(
+                    'query' => 'max_length <= :max_length',
+                    'bound' => '%s',
+                ),
+                'min_wingspread' => array(
+                    'query' => 'min_wingspread >= :min_wingspread',
+                    'bound' => '%s',
+                ),
+                'max_wingspread' => array(
+                    'query' => 'max_wingspread <= :max_wingspread',
+                    'bound' => '%s',
+                ),
+                'min_weight' => array(
+                    'query' => 'min_weight >= :min_weight',
+                    'bound' => '%s',
+                ),
+                'max_weight' => array(
+                    'query' => 'max_weight <= :max_weight',
+                    'bound' => '%s',
+                ),
+                'min_life_expectancy' => array(
+                    'query' => 'life_expectancy >= :min_life_expectancy',
+                    'bound' => '%s',
+                ),
+                'max_life_expectancy' => array(
+                    'query' => 'life_expectancy <= :max_life_expectancy',
+                    'bound' => '%s',
+                ),
+                'min_breeding_duration' => array(
+                    'query' => 'breeding_duration >= :min_breeding_duration',
+                    'bound' => '%s',
+                ),
+                'max_breeding_duration' => array(
+                    'query' => 'breeding_duration <= :max_breeding_duration',
+                    'bound' => '%s',
+                ),
+                'family_idfamily' => array(
+                    'query' => 'family_idfamily = :family_idfamily',
+                    'bound' => '%s',
+                ),
+                'breeding_place_idbreeding_place' => array(
+                    'query' => 'breeding_place_idbreeding_place = :breeding_place_idbreeding_place',
+                    'bound' => '%s',
+                ),
+            );
+            
+            function prepare_query($get){
+                global $query_templates;
+                
+                $new = array();
+                $queries = array_intersect_key($query_templates, $get);
+                
+                foreach($queries as $key => $val) {
+                    $bound = sprintf($val['bound'], $get[$key]);
+                    $new[':'.$key] = $bound;
+                }
+                
+                $query_strings = join(' AND ', array_map(function($el){ return $el['query']; }, $queries));
+                $query = 'SELECT * FROM bird WHERE '.$query_strings.';';
+                
+                return array($query, $new);
+                
+            }
+            
+            // Array mit allen M2M-Relationenen
+            $m2m = array(
+                'bird_has_color' => array( // Tabellenname der Relation dient als Key
+                    'fk_id' => 'color_idcolor', // Spalte des anderen Schluessels
+                    'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
+                ),
+                'bird_has_food' => array( // Tabellenname der Relation dient als Key
+                    'fk_id' => 'food_idfood', // Spalte des anderen Schluessels
+                    'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
+                ),
+                'bird_has_habitat' => array( // Tabellenname der Relation dient als Key
+                    'fk_id' => 'habitat_idhabitat', // Spalte des anderen Schluessels
+                    'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
+                ),
+            );
+                        
+            if(!empty($_GET)) {
+                $clean_get = array_filter($_GET);
+                $split_m2m = split_m2m($m2m, $clean_get);
+                $no_m2m = $split_m2m[0]; // Daten ohne Relationen
+                $m2m_rel = $split_m2m[1]; // Nur die Relationen // Variabeln fuer Prepared-Statements, z.B. :name oder :name_latin als Array
+                
+                $query = prepare_query($clean_get);
+                $bound = $query[1];
+                $query = $query[0];
+                
+                $stmt = $dbHandler->prepare($query);
+                $stmt->execute($bound);
+                $result = $stmt->fetchAll();
+                
+                echo $query;
+                
+            }
 
+            
+            $family_keys = get_values_from_db($dbHandler, 'family'); // family Werte abfragen (FK)
+            $breeding_place_keys = get_values_from_db($dbHandler, 'breeding_place'); // breeding_place Werte abfragen (FK)
+
+            $color_keys = get_values_from_db($dbHandler, 'color'); // color Werte abfragen (M2M)
+            $food_keys = get_values_from_db($dbHandler, 'food'); // food Werte abfragen (M2M)
+            $habitat_keys = get_values_from_db($dbHandler, 'habitat'); // habitat Werte abfragen (M2M)
+            
 
             ?>
-
-            <p><label for='name'>Name:</label><input type='text' id='name' name='name'></p>
-            <p><label for='name_latin'>Name in Latein:</label><input type='text' id='name_latin' name='name_latin'></p>
-            <p><label for='min_livestock'>Bestand:</label><input type='number' id='min_livestock' name='min_livestock'> bis <input type='number' id='max_livestock' name='max_livestock'></p>
-            <p><label for='min_length'>Länge:</label><input type='number' id='min_length' name='min_length'> bis <input type='number' id='max_length' name='max_length'></p>
-            <p><label for='min_wingspread'>Flügelspannweite:</label><input type='number' id='min_wingspread' name='min_wingspread'> bis <input type='number' id='max_wingspread' name='max_wingspread'></p>
-            <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight'> bis <input type='number' id='max_weight' name='max_weight'></p>
-            <p><label for='life_expectancy'>Lebenserwartung:</label><input type='number' id='life_expectancy' name='life_expectancy'></p>
-            <p><label for='breeding_duration'>Brutdauer:</label><input type='number' id='breeding_duration' name='breeding_duration'></p>
-            <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list'></p>
-            <p>Farbe</p>
-            <p>Lebensraum</p>
-            <p>Brutort</p>
-            <p>Famile</p>
-            <p>Ordnung</p>
-
-            <p><input type='submit' value='suchen'><input type='reset' value='Zurücksetzen'></p>
+            <p><label for='name'>Name:</label><input type='text' id='name' name='name' <?php echo form_value('name', 'text'); ?>></p>
+            <p><label for='name_latin'>Name in Latein:</label><input type='text' id='name_latin' name='name_latin' <?php echo form_value('name_latin', 'text'); ?>></p>
+            <p><label for='min_livestock'>Bestand:</label><input type='number' id='min_livestock' name='min_livestock' <?php echo form_value('min_livestock', 'text'); ?>> bis <input type='number' id='max_livestock' name='max_livestock' <?php echo form_value('max_livestock', 'text'); ?>></p>
+            <p><label for='min_length'>LÃ¤nge:</label><input type='number' id='min_length' name='min_length' <?php echo form_value('min_length', 'text'); ?>> bis <input type='number' id='max_length' name='max_length' <?php echo form_value('max_length', 'text'); ?>></p>
+            <p><label for='min_wingspread'>FlÃ¼gelspannweite:</label><input type='number' id='min_wingspread' name='min_wingspread' <?php echo form_value('min_wingspread', 'text'); ?>> bis <input type='number' id='max_wingspread' name='max_wingspread' <?php echo form_value('min_wingspread', 'text'); ?>></p>
+            <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight' <?php echo form_value('min_weight', 'text'); ?>> bis <input type='text' id='max_weight' name='max_weight' <?php echo form_value('max_weight', 'text'); ?>></p>
+            <p><label for='min_life_expectancy'>Lebenserwartung:</label><input type='number' id='min_life_expectancy' name='min_life_expectancy' <?php echo form_value('min_live_expectancy', 'text'); ?>> bis <input type="number" id="max_life_expectancy" name="max_life_expectancy" <?php echo form_value('max_live_expectancy', 'text'); ?>></p>
+            <p><label for='min_breeding_duration'>Brutdauer:</label><input type='number' id='min_breeding_duration' name='min_breeding_duration' <?php echo form_value('min_breeding_duration', 'text'); ?>> bis <input type="number" id="max_breeding_duration" name="max_breeding_duration" <?php echo form_value('max_breeding_duration', 'text'); ?>></p>
+            <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value('min_livestock', 'checkbox'); ?>></p>
+            
+            <?php
+                // Foreign Key Widgets rendern, also die <select> Dinger, siehe render Funktion. Erstes Argument ist die Datei, die das Template enthaelt
+                // Das zweite Argument ist der Kontext, also Angaben, wodurch die Platzhalter im Template (im Array der Key) ersetzt werden sollen (im Array der entsprechende Wert)
+                echo $renderer->render('widgets/foreign_key.html', array('id' => 'family',
+                    'name' => 'family_idfamily', 'verbose_name' => 'Familie',
+                    'array' => $family_keys, 'fk_id' => 'idfamily', 'fk_name' => 'name',
+                    'multiple' => ''));
+                
+                echo $renderer->render('widgets/foreign_key.html', array('id' => 'breeding_place',
+                    'name' => 'breeding_place_idbreeding_place', 'verbose_name' => 'Brutort',
+                    'array' => $breeding_place_keys, 'fk_id' => 'idbreeding_place', 'fk_name' => 'name',
+                    'multiple' => ''));
+                
+                // M2M Widgets rendern, <select multiple>
+                echo $renderer->render('widgets/foreign_key.html', array('id' => 'bird_has_color',
+                    'name' => 'bird_has_color[]', 'verbose_name' => 'Farbe',
+                    'array' => $color_keys, 'fk_id' => 'idcolor', 'fk_name' => 'color_name',
+                    'multiple' => 'multiple'));
+                
+                echo $renderer->render('widgets/foreign_key.html', array('id' => 'bird_has_food',
+                    'name' => 'bird_has_food[]', 'verbose_name' => 'Nahrung',
+                    'array' => $food_keys, 'fk_id' => 'idfood', 'fk_name' => 'name',
+                    'multiple' => 'multiple'));
+                
+                echo $renderer->render('widgets/foreign_key.html', array('id' => 'bird_has_habitat',
+                    'name' => 'bird_has_habitat[]', 'verbose_name' => 'Habitat',
+                    'array' => $habitat_keys, 'fk_id' => 'idhabitat', 'fk_name' => 'name',
+                    'multiple' => 'multiple'));
+                
+            ?>
+            
+            <p><label for='description'>Beschreibung:</label><textarea id='description' name='description'></textarea></p>
+            <p><label for='debug'>Debug:</label><input type='checkbox' id='debug' name='debug'></p>
+            
+            <p><input type='submit' value='Suchen'><input type='reset' value='ZurÃ¼cksetzen'></p>
         </form>
     </fieldset>
+    
+    <ul>
+        <?php 
+            foreach($result as $object) {
+                echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].'</a></li>';
+            }
+        ?>
+    </ul>
 <?php include 'parts/footer.php' ?>
 </body>
 </html>
