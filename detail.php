@@ -2,7 +2,7 @@
 <?php include 'parts/head.php' ?>
 <body>
 <?php include 'parts/header.php' ?>
-    
+    <a href="/vogelpedia/edit.php?pk=<?php echo $_GET['pk'] ?>">Diesen Vogel bearbeiten</a>
     <?php 
         require_once 'settings/object.php';
         require_once 'renderer/object.php';
