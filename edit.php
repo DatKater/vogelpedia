@@ -55,6 +55,8 @@ if(isset($object['red_list'])) {
         unset($object['red_list']);
     }
 }
+
+print_r($object);
 ?>
     <?php include 'parts/header.php' ?>
     <form method="post" action="/vogelpedia/edit.php?pk=<?php echo $_GET['pk'] ?>">
@@ -64,9 +66,9 @@ if(isset($object['red_list'])) {
     <p><label for='min_livestock'>Bestand:</label><input type='number' id='min_livestock' name='min_livestock' <?php echo form_value($object, 'min_livestock', 'text'); ?>> bis <input type='number' id='max_livestock' name='max_livestock' <?php echo form_value($object, 'max_livestock', 'text'); ?>></p>
     <p><label for='min_length'>Länge:</label><input type='number' id='min_length' name='min_length' <?php echo form_value($object, 'min_length', 'text'); ?>> bis <input type='number' id='max_length' name='max_length' <?php echo form_value($object, 'max_length', 'text'); ?>></p>
     <p><label for='min_wingspread'>Flügelspannweite:</label><input type='number' id='min_wingspread' name='min_wingspread' <?php echo form_value($object, 'min_wingspread', 'text'); ?>> bis <input type='number' id='max_wingspread' name='max_wingspread' <?php echo form_value($object, 'min_wingspread', 'text'); ?>></p>
-    <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight' <?php echo form_value('min_weight', 'text'); ?>> bis <input type='text' id='max_weight' name='max_weight' <?php echo form_value($object, 'max_weight', 'text'); ?>></p>
-    <p><label for='min_life_expectancy'>Lebenserwartung:</label><input type='number' id='min_life_expectancy' name='min_life_expectancy' <?php echo form_value($object, 'min_live_expectancy', 'text'); ?>> bis <input type="number" id="max_life_expectancy" name="max_life_expectancy" <?php echo form_value($object, 'max_live_expectancy', 'text'); ?>></p>
-    <p><label for='min_breeding_duration'>Brutdauer:</label><input type='number' id='min_breeding_duration' name='min_breeding_duration' <?php echo form_value($object, 'min_breeding_duration', 'text'); ?>> bis <input type="number" id="max_breeding_duration" name="max_breeding_duration" <?php echo form_value($object, 'max_breeding_duration', 'text'); ?>></p>
+    <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight' <?php echo form_value($object, 'min_weight', 'text'); ?>> bis <input type='text' id='max_weight' name='max_weight' <?php echo form_value($object, 'max_weight', 'text'); ?>></p>
+    <p><label for='life_expectancy'>Lebenserwartung:</label><input type='number' id='life_expectancy' name='life_expectancy' <?php echo form_value($object, 'life_expectancy', 'text'); ?>></p>
+    <p><label for='breeding_duration'>Brutdauer:</label><input type='number' id='breeding_duration' name='breeding_duration' <?php echo form_value($object, 'breeding_duration', 'text'); ?>></p>
     <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($object, 'red_list', 'checkbox'); ?>></p>
     
     <p><input type='submit' value='Absenden'><input type='reset' value='Zurücksetzen'></p>
