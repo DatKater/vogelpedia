@@ -20,22 +20,6 @@
                     $debug = NULL; // Ansonsten ist Debug nicht gesetzt
                 }
                 
-                // Array mit allen M2M-Relationenen
-                $m2m = array(
-                    'bird_has_color' => array( // Tabellenname der Relation dient als Key
-                        'fk_id' => 'color_idcolor', // Spalte des anderen Schluessels
-                        'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
-                    ),
-                    'bird_has_food' => array( // Tabellenname der Relation dient als Key
-                        'fk_id' => 'food_idfood', // Spalte des anderen Schluessels
-                        'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
-                    ),
-                    'bird_has_habitat' => array( // Tabellenname der Relation dient als Key
-                        'fk_id' => 'habitat_idhabitat', // Spalte des anderen Schluessels
-                        'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
-                    ),
-                );
-                
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Wenn POST, Formular also gesendet
                     $split_m2m = split_m2m($m2m, $_POST); // M2M Relationen von POST trennen
                     $no_m2m = $split_m2m[0]; // Daten ohne Relationen

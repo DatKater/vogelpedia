@@ -102,22 +102,6 @@
                 return array($query, $new);
                 
             }
-            
-            // Array mit allen M2M-Relationenen
-            $m2m = array(
-                'bird_has_color' => array( // Tabellenname der Relation dient als Key
-                    'fk_id' => 'color_idcolor', // Spalte des anderen Schluessels
-                    'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
-                ),
-                'bird_has_food' => array( // Tabellenname der Relation dient als Key
-                    'fk_id' => 'food_idfood', // Spalte des anderen Schluessels
-                    'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
-                ),
-                'bird_has_habitat' => array( // Tabellenname der Relation dient als Key
-                    'fk_id' => 'habitat_idhabitat', // Spalte des anderen Schluessels
-                    'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
-                ),
-            );
                         
             if(!empty($_GET)) {
                 $clean_get = array_filter($_GET);
@@ -147,15 +131,15 @@
             
 
             ?>
-            <p><label for='name'>Name:</label><input type='text' id='name' name='name' <?php echo form_value('name', 'text'); ?>></p>
-            <p><label for='name_latin'>Name in Latein:</label><input type='text' id='name_latin' name='name_latin' <?php echo form_value('name_latin', 'text'); ?>></p>
-            <p><label for='min_livestock'>Bestand:</label><input type='number' id='min_livestock' name='min_livestock' <?php echo form_value('min_livestock', 'text'); ?>> bis <input type='number' id='max_livestock' name='max_livestock' <?php echo form_value('max_livestock', 'text'); ?>></p>
-            <p><label for='min_length'>Länge:</label><input type='number' id='min_length' name='min_length' <?php echo form_value('min_length', 'text'); ?>> bis <input type='number' id='max_length' name='max_length' <?php echo form_value('max_length', 'text'); ?>></p>
-            <p><label for='min_wingspread'>Flügelspannweite:</label><input type='number' id='min_wingspread' name='min_wingspread' <?php echo form_value('min_wingspread', 'text'); ?>> bis <input type='number' id='max_wingspread' name='max_wingspread' <?php echo form_value('min_wingspread', 'text'); ?>></p>
-            <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight' <?php echo form_value('min_weight', 'text'); ?>> bis <input type='text' id='max_weight' name='max_weight' <?php echo form_value('max_weight', 'text'); ?>></p>
-            <p><label for='min_life_expectancy'>Lebenserwartung:</label><input type='number' id='min_life_expectancy' name='min_life_expectancy' <?php echo form_value('min_live_expectancy', 'text'); ?>> bis <input type="number" id="max_life_expectancy" name="max_life_expectancy" <?php echo form_value('max_live_expectancy', 'text'); ?>></p>
-            <p><label for='min_breeding_duration'>Brutdauer:</label><input type='number' id='min_breeding_duration' name='min_breeding_duration' <?php echo form_value('min_breeding_duration', 'text'); ?>> bis <input type="number" id="max_breeding_duration" name="max_breeding_duration" <?php echo form_value('max_breeding_duration', 'text'); ?>></p>
-            <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value('min_livestock', 'checkbox'); ?>></p>
+            <p><label for='name'>Name:</label><input type='text' id='name' name='name' <?php echo form_value($_GET, 'name', 'text'); ?>></p>
+            <p><label for='name_latin'>Name in Latein:</label><input type='text' id='name_latin' name='name_latin' <?php echo form_value($_GET, 'name_latin', 'text'); ?>></p>
+            <p><label for='min_livestock'>Bestand:</label><input type='number' id='min_livestock' name='min_livestock' <?php echo form_value($_GET, 'min_livestock', 'text'); ?>> bis <input type='number' id='max_livestock' name='max_livestock' <?php echo form_value($_GET, 'max_livestock', 'text'); ?>></p>
+            <p><label for='min_length'>Länge:</label><input type='number' id='min_length' name='min_length' <?php echo form_value($_GET, 'min_length', 'text'); ?>> bis <input type='number' id='max_length' name='max_length' <?php echo form_value($_GET, 'max_length', 'text'); ?>></p>
+            <p><label for='min_wingspread'>Flügelspannweite:</label><input type='number' id='min_wingspread' name='min_wingspread' <?php echo form_value($_GET, 'min_wingspread', 'text'); ?>> bis <input type='number' id='max_wingspread' name='max_wingspread' <?php echo form_value($_GET, 'min_wingspread', 'text'); ?>></p>
+            <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight' <?php echo form_value('min_weight', 'text'); ?>> bis <input type='text' id='max_weight' name='max_weight' <?php echo form_value($_GET, 'max_weight', 'text'); ?>></p>
+            <p><label for='min_life_expectancy'>Lebenserwartung:</label><input type='number' id='min_life_expectancy' name='min_life_expectancy' <?php echo form_value($_GET, 'min_live_expectancy', 'text'); ?>> bis <input type="number" id="max_life_expectancy" name="max_life_expectancy" <?php echo form_value($_GET, 'max_live_expectancy', 'text'); ?>></p>
+            <p><label for='min_breeding_duration'>Brutdauer:</label><input type='number' id='min_breeding_duration' name='min_breeding_duration' <?php echo form_value($_GET, 'min_breeding_duration', 'text'); ?>> bis <input type="number" id="max_breeding_duration" name="max_breeding_duration" <?php echo form_value($_GET, 'max_breeding_duration', 'text'); ?>></p>
+            <!--<p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($_GET, 'min_livestock', 'checkbox'); ?>></p>-->
             
             <?php
                 // Foreign Key Widgets rendern, also die <select> Dinger, siehe render Funktion. Erstes Argument ist die Datei, die das Template enthaelt
@@ -188,9 +172,8 @@
                 
             ?>
             
-            <p><label for='description'>Beschreibung:</label><textarea id='description' name='description'></textarea></p>
-            <p><label for='debug'>Debug:</label><input type='checkbox' id='debug' name='debug'></p>
-            
+            <p><label for='description'>Beschreibung:</label><textarea id='description' name='description'><?php echo form_value($_GET, 'description', 'textarea'); ?></textarea></p>
+
             <p><input type='submit' value='Suchen'><input type='reset' value='Zurücksetzen'></p>
         </form>
     </fieldset>

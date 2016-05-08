@@ -86,19 +86,19 @@ function handle_m2m($m2m, $id, $handler) {
     }
 }
 
-function form_value($name, $type='text', $select_value = ''){
+function form_value($array, $name, $type='text', $select_value = ''){
 
-   if(isset($_GET[$name])){
+   if(isset($array[$name])){
 
       switch($type){
 
          case 'text':{
-            return ' value="'.htmlspecialchars($_GET[$name]).'" ';
+            return ' value="'.htmlspecialchars($array[$name]).'" ';
             break;
          }
 
          case 'textarea':{
-            return htmlspecialchars($_GET[$name]);
+            return htmlspecialchars($array[$name]);
             break;
          }
 
@@ -108,14 +108,14 @@ function form_value($name, $type='text', $select_value = ''){
          }
 
          case 'radio':{
-             if($_GET[$name] == $select_value){
+             if($array[$name] == $select_value){
                return ' checked="checked" ';
             }
             break;
          }
 
          case 'select':{
-            if($_GET[$name] == $select_value){
+            if($array[$name] == $select_value){
                return ' selected="selected" ';
             }
             break;
@@ -126,6 +126,14 @@ function form_value($name, $type='text', $select_value = ''){
    }
 
    return '';
+}
+
+function is_404($condition) {
+    if($condition) {
+        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);
+        include 'parts/404.html';
+        exit;
+    }
 }
 
 ?>
