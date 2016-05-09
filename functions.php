@@ -136,4 +136,25 @@ function is_404($condition) {
     }
 }
 
+function get_fk_query($params, $var) {
+    $queries = array();
+    foreach($params as $key => $param){
+        $query = sprintf('SELECT %1$s.* FROM %1$s, %3$s, %5$s WHERE %1$s.%2$s = %5$s.%6$s AND %3$s.%4$s = %5$s.%7$s AND %3$s.%4$s = %8$s;',
+                $param['table']['name'], $param['table']['id'],
+                $param['table_fk']['name'], $param['table_fk']['id'],
+                $param['table_m2m']['name'], $param['table_m2m']['id_t'],
+                $param['table_m2m']['id_f'], $var);
+        $queries[$key] = $query;
+    }
+
+    return($queries);
+}
+
+function print_object($array, $key, $str) {
+    $vals = array();
+    foreach($array[$key] as $obj) {
+        array_push($vals, $obj[$str]);
+    }
+    return join($vals, ', ');
+}
 ?>

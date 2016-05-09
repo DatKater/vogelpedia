@@ -5,8 +5,8 @@
 <p><b>Beschreibung:</b> {object.description}</p>
 <p><b>Verwandtschaft:</b> {Familie}, {Ordnung} </p>
 <p><b>Bestand CH:</b> {object.min_livestock}-{object.max_livestock}</p>
-<p><b>Lebensraum:</b> {Lebensraum}</p>
-<p><b>Nahrung:</b> {Nahrung}</p>
+<p><b>Lebensraum:</b> {% print_object relations habitat name %}</p>
+<p><b>Nahrung:</b> {% print_object relations food name %}</p>
 <p><b>Brutort:</b> {Brutort} Beschreibung wenn dar&uuml;ber f&auml;hrt </p>
 <p><b>Brutdauer:</b> {object.breeding_duration} Tage</p>
 <p><b>Rote Liste:</b> {object.red_list}</p>
@@ -14,7 +14,5 @@
 <p><b>Spannweite:</b> {object.min_wingspread}-{object.max_wingspread} cm</p>
 <p><b>Gewicht:</b> {object.min_weight}-{object.max_weight} g</p>
 <p><b>Lebenserwartung:</b> {object.life_expectancy} Jahre</p>
-<p><b>Farbe:</b> {Farben}</p>
+<p><b>Farbe:</b> {% print_object relations color color_name %}</p>
 <br>
-
-

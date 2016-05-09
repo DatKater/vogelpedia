@@ -180,8 +180,10 @@
     
     <ul>
         <?php 
-            foreach($result as $object) {
-                echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].'</a></li>';
+            if(isset($result)) {
+                foreach($result as $object) {
+                    echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].'</a></li>';
+                }
             }
         ?>
     </ul>
