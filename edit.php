@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $no_m2m['red_list'] = 0;
     }
-    
-    // Variabeln fuer Prepared-Statements, z.B. :name oder :name_latin als Array mit 
+
+    // Variabeln fuer Prepared-Statements, z.B. :name oder :name_latin als Array mit
     $bound_variables = prepare_bound_variables($no_m2m);
     $bound = array();
 
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bound = join(',', $bound); // name=:name,name_latin=:name_latin etc
     $query = sprintf($query, $bound); // Query zusammenfügen
     $bound_variables[':pk'] = $pk; // pk zu den Daten hinzufuegen
-    $stmt = $dbHandler->prepare($query); 
+    $stmt = $dbHandler->prepare($query);
     print_r($bound_variables);
     $stmt->execute($bound_variables);
     $stmt->closeCursor();
@@ -59,21 +59,44 @@ if(isset($object['red_list'])) {
 print_r($object);
 ?>
     <?php include 'parts/header.php' ?>
+    <div id="main">
+    <div id="inhalt">
+    <br>
+    <br>
+    Hier k&ouml;nnen Sie einen schon bestehenden Vogel bearbeiten.
+    <br><br>
     <form method="post" action="/vogelpedia/edit.php?pk=<?php echo $_GET['pk'] ?>">
+    <table border="0">
     <!-- Formular -->
-    <p><label for='name'>Name:</label><input type='text' id='name' name='name' <?php echo form_value($object, 'name', 'text'); ?>></p>
-    <p><label for='name_latin'>Name in Latein:</label><input type='text' id='name_latin' name='name_latin' <?php echo form_value($object, 'name_latin', 'text'); ?>></p>
-    <p><label for='min_livestock'>Bestand:</label><input type='number' id='min_livestock' name='min_livestock' <?php echo form_value($object, 'min_livestock', 'text'); ?>> bis <input type='number' id='max_livestock' name='max_livestock' <?php echo form_value($object, 'max_livestock', 'text'); ?>></p>
-    <p><label for='min_length'>Länge:</label><input type='number' id='min_length' name='min_length' <?php echo form_value($object, 'min_length', 'text'); ?>> bis <input type='number' id='max_length' name='max_length' <?php echo form_value($object, 'max_length', 'text'); ?>></p>
-    <p><label for='min_wingspread'>Flügelspannweite:</label><input type='number' id='min_wingspread' name='min_wingspread' <?php echo form_value($object, 'min_wingspread', 'text'); ?>> bis <input type='number' id='max_wingspread' name='max_wingspread' <?php echo form_value($object, 'min_wingspread', 'text'); ?>></p>
-    <p><label for='min_weight'>Gewicht:</label><input type='number' id='min_weight' name='min_weight' <?php echo form_value($object, 'min_weight', 'text'); ?>> bis <input type='text' id='max_weight' name='max_weight' <?php echo form_value($object, 'max_weight', 'text'); ?>></p>
-    <p><label for='life_expectancy'>Lebenserwartung:</label><input type='number' id='life_expectancy' name='life_expectancy' <?php echo form_value($object, 'life_expectancy', 'text'); ?>></p>
-    <p><label for='breeding_duration'>Brutdauer:</label><input type='number' id='breeding_duration' name='breeding_duration' <?php echo form_value($object, 'breeding_duration', 'text'); ?>></p>
-    <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($object, 'red_list', 'checkbox'); ?>></p>
-    
-    <p><label for='description'>Beschreibung:</label><textarea id='description' name='description'><?php echo form_value($object, 'description', 'textarea'); ?></textarea></p>
-    <p><input type='submit' value='Absenden'><input type='reset' value='Zurücksetzen'></p>
+    <tr>
+    <td><label for='name'>Name:</label></td><td><input type='text' id='name' name='name' <?php echo form_value($object, 'name', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='name_latin'>Name in Latein:</label></td><td><input type='text' id='name_latin' name='name_latin' <?php echo form_value($object, 'name_latin', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='min_livestock'>Bestand:</label></td><td><input type='number' id='min_livestock' name='min_livestock' <?php echo form_value($object, 'min_livestock', 'text'); ?>> </td><td>bis </td><td><input type='number' id='max_livestock' name='max_livestock' <?php echo form_value($object, 'max_livestock', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='min_length'>Länge:</label></td><td><input type='number' id='min_length' name='min_length' <?php echo form_value($object, 'min_length', 'text'); ?>></td><td> bis</td><td> <input type='number' id='max_length' name='max_length' <?php echo form_value($object, 'max_length', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='min_wingspread'>Flügelspannweite:</label></td><td><input type='number' id='min_wingspread' name='min_wingspread' <?php echo form_value($object, 'min_wingspread', 'text'); ?>></td><td> bis </td><td><input type='number' id='max_wingspread' name='max_wingspread' <?php echo form_value($object, 'min_wingspread', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='min_weight'>Gewicht:</label></td><td><input type='number' id='min_weight' name='min_weight' <?php echo form_value($object, 'min_weight', 'text'); ?>></td><td> bis </td><td><input type='text' id='max_weight' name='max_weight' <?php echo form_value($object, 'max_weight', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='life_expectancy'>Lebenserwartung:</label></td><td><input type='number' id='life_expectancy' name='life_expectancy' <?php echo form_value($object, 'life_expectancy', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='breeding_duration'>Brutdauer:</label></td><td><input type='number' id='breeding_duration' name='breeding_duration' <?php echo form_value($object, 'breeding_duration', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='red_list'>Rote Liste:</label></td><td><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($object, 'red_list', 'checkbox'); ?>></td>
+    </tr><tr>
+    <td><label for='description'>Beschreibung:</label></td><td><textarea id='description' name='description'><?php echo form_value($object, 'description', 'textarea'); ?></textarea></td>
+    </tr><tr><td><br></td></tr><tr>
+    <td></td>
+    <td><input class="button" type='submit' value='Absenden'><input class="button"type='reset' value='Zurücksetzen'></p>
+    </tr>
+    </table>
     </form>
-    
+    <br>
+    <br>
+    </div>
+    </div>
 <?php include 'parts/footer.php' ?>
 </body>
