@@ -1,14 +1,19 @@
 <html>
 <?php include 'parts/head.php' ?>
 <body>
+
 <?php include 'parts/header.php' ?>
-    <a href="/vogelpedia/edit.php?pk=<?php echo $_GET['pk'] ?>">Diesen Vogel bearbeiten</a>
-    <?php 
+
+    <div id="main">
+    <div id="inhalt">
+    <a id="bearbeiten" href="/vogelpedia/edit.php?pk=<?php echo $_GET['pk'] ?>">Eintrag bearbeiten</a>
+    <link href="/vogelpedia/css/styles.css" rel="stylesheet">
+    <?php
         require_once 'settings/object.php';
         require_once 'renderer/object.php';
         require_once '/db_access/models.php';
         require_once 'functions.php';
-        
+
         $dbHandler = get_handler();
         $query = "SELECT * FROM bird WHERE idbird=:pk;";
         $renderer = new TemplateRenderer();
@@ -18,6 +23,8 @@
         $object = $stmt->fetchAll();
         echo $renderer->render('detail_content.html', array('object' => $object[0]));
     ?>
-    
+</div>
+</div> <!-- #main -->
 <?php include 'parts/footer.php' ?>
+
 </body>
