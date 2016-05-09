@@ -45,8 +45,8 @@ class TemplateRenderer {
             }
             
             $return = call_user_func_array($func, $cleaned_params); // Funktion mit den Parametern aufrufen, Rueckgabewert speichern
-            $file = mb_ereg_replace($match[0], $return, $file); // Den urspruenglichen Match durch den Rueckgabewert der Funktion ersetzen
             
+            $file = mb_ereg_replace($this->left_delimiter.$match[0].$this->right_delimiter, $return, $file); // Den urspruenglichen Match durch den Rueckgabewert der Funktion ersetzen
         }
         return $file; // Template ist nun sauberes HTML
     }
