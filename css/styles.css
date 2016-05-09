@@ -140,7 +140,7 @@ table {
    width: 100%;
    border: 1px dashed;
    padding: 5px;
- 
+
 }
 
 table input, textarea, select {
@@ -163,4 +163,35 @@ table .button {
 
 table .button:hover {
    background-color:  #00b300;
+}
+
+#result ul {
+   margin: 0;
+   margin-right: 5%;
+   padding: 0;
+}
+
+#result li {
+   padding: 10px;
+   list-style: none;
+   color: black;
+   width: 100%;
+   margin: 0;
+   border-top: 1px dashed black;
+   border-bottom: 1px dashed black;
+
+}
+
+#result li a {
+   padding: 10px;
+   padding-right: 60%;
+   margin-right: 0px;
+   margin-left: 0px;
+   height: 100%;
+   text-decoration: none;
+   color: black;
+}
+
+#result li a:hover {
+   font-weight: bold;
 }
