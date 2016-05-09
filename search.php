@@ -5,7 +5,7 @@
 <div id="main">
 <div id="inhalt">
         <br>
-        Hier k&ouml;nnen Sie mit V&ouml;gel nach bestimmten Eigenschaften filtern. F&uuml;llen sie daf&uuml;r, das untenstehende Formular aus und dr&uuml;cken Sie auf senden!
+        Hier k&ouml;nnen Sie mit V&ouml;gel nach bestimmten Eigenschaften filtern. F&uuml;llen sie daf&uuml;r, das untenstehende Formular aus und dr&uuml;cken Sie auf 'Suchen'!
         <br>
         <br>
         <form method='get'>
@@ -196,17 +196,30 @@
             </table>
         </form>
         <br>
-
-
+    <h2>Suchergebnisse: </h2>
+    <div id="result">
     <ul>
         <?php
             if(isset($result)) {
+                $i = count($result);
+                if ($i = 1) {
+                    echo ''.$i.' Ergebnis gefunden <br><br>';
+                }
+
+                else {
+                    echo ''.$i.' Ergebnisse gefunden <br><br>';
+                }
+
                 foreach($result as $object) {
-                    echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].'</a></li>';
+                    echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].', <i>'.$object['name_latin'].'</i></a></li>';
                 }
             }
         ?>
     </ul>
+    </div>
+<br>
+<br>
+<br>
 </div>
 </div>
 <?php include 'parts/footer.php' ?>
