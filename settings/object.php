@@ -17,4 +17,52 @@ $m2m = array(
         'id' => 'bird_idbird', // Spalte des eigenen Schluessels (bird)
     ),
 );
+    
+$params_for_m2m = array(
+    'color' => array(
+        'table' => array(
+            'name' => 'color',
+            'id' => 'idcolor',
+        ),
+        'table_fk' => array(
+            'name' => 'bird',
+            'id' => 'idbird',
+        ),
+        'table_m2m' => array(
+            'name' => 'bird_has_color',
+            'id_t' => 'color_idcolor',
+            'id_f' => 'bird_idbird',
+        )
+    ),
+    'food' => array(
+        'table' => array(
+            'name' => 'food',
+            'id' => 'idfood',
+        ),
+        'table_fk' => array(
+            'name' => 'bird',
+            'id' => 'idbird',
+        ),
+        'table_m2m' => array(
+            'name' => 'bird_has_food',
+            'id_t' => 'food_idfood',
+            'id_f' => 'bird_idbird',
+        )
+    ),
+    'habitat' => array(
+        'table' => array(
+            'name' => 'habitat',
+            'id' => 'idhabitat',
+        ),
+        'table_fk' => array(
+            'name' => 'bird',
+            'id' => 'idbird',
+        ),
+        'table_m2m' => array(
+            'name' => 'bird_has_habitat',
+            'id_t' => 'habitat_idhabitat',
+            'id_f' => 'bird_idbird',
+        )
+    ),
+);
 ?>
