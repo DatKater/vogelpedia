@@ -17,12 +17,12 @@
         $dbHandler = get_handler();
         $renderer = new TemplateRenderer();
         
-        
-        $query = "SELECT * FROM bird WHERE idbird=:pk;";
-        $stmt = $dbHandler->prepare($query);
-        $stmt->bindParam(':pk', $_GET['pk']);
-        $stmt->execute();
-        $object = $stmt->fetchAll();
+//        $query = "SELECT * FROM bird WHERE idbird=:pk;";
+//        $stmt = $dbHandler->prepare($query);
+//        $stmt->bindParam(':pk', $_GET['pk']);
+//        $stmt->execute();
+//        $object = $stmt->fetchAll();
+        $object = get_object_by_col($dbHandler, 'bird', 'idbird', $_GET['pk']);
         $m2m_queries = get_fk_query($params_for_m2m, ':var');
         $relations = array();
         
@@ -34,7 +34,31 @@
             $relations[$name] = $obj;
         }
         
-        echo $renderer->render('detail_content.html', array('object' => $object[0], 'relations' => $relations));
+        $fks = array(
+            array(
+                'table' => 'breeding_place',
+                'id' => 'idbreeding_place',
+                'fk' => 'breeding_place_idbreeding_place'
+            ),
+            array(
+                'table' => 'family',
+                'id' => 'idfamily',
+                'fk' => 'family_idfamily'
+            ),
+        );
+        foreach($fks as $fk) {
+            $obj = get_object_by_col($dbHandler, $fk['table'], $fk['id'], $object[$fk['fk']]);
+            $relations[$fk['table']] = $obj;
+        }
+        $query = "SELECT * FROM `order` WHERE idorder=:id;";
+        $stmt = $dbHandler->prepare($query);
+        $stmt->bindParam(':id', $relations['family']['order_idorder']);
+        $stmt->execute();
+        $order = $stmt->fetchAll()[0];
+        $stmt->closeCursor();
+        $relations['order'] = $order;
+        
+        echo $renderer->render('detail_content.html', array('object' => $object, 'relations' => $relations));
     ?>
     
     </div>

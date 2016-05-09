@@ -2,22 +2,22 @@
 <?php include 'parts/head.php' ?>
 <body>
 <?php include 'parts/header.php' ?>
-<div id="main">
-<div id="inhalt">
+    <div id="main">
+    <div id="inhalt">
         <br>
-        Hier k&ouml;nnen Sie mit V&ouml;gel nach bestimmten Eigenschaften filtern. F&uuml;llen sie daf&uuml;r, das untenstehende Formular aus und dr&uuml;cken Sie auf 'Suchen'!
+        Hier k&ouml;nnen Sie mit V&ouml;gel nach bestimmten Eigenschaften filtern. F&uuml;llen sie daf&uuml;r, das untenstehende Formular aus und dr&uuml;cken Sie auf 'Suchen'! 
         <br>
         <br>
         <form method='get'>
             <?php
-
+            
             require_once('settings/object.php');
             require_once('functions.php');
             require_once('renderer/object.php');
-
+            
             $dbHandler = get_handler();
             $renderer = new TemplateRenderer();
-
+            
             $query_templates = array(
                 'name' => array(
                     'query' => 'name LIKE :name',
@@ -88,51 +88,51 @@
                     'bound' => '%s',
                 ),
             );
-
+            
             function prepare_query($get){
                 global $query_templates;
-
+                
                 $new = array();
                 $queries = array_intersect_key($query_templates, $get);
-
+                
                 foreach($queries as $key => $val) {
                     $bound = sprintf($val['bound'], $get[$key]);
                     $new[':'.$key] = $bound;
                 }
-
+                
                 $query_strings = join(' AND ', array_map(function($el){ return $el['query']; }, $queries));
                 $query = 'SELECT * FROM bird WHERE '.$query_strings.';';
-
+                
                 return array($query, $new);
-
+                
             }
-
+                        
             if(!empty($_GET)) {
                 $clean_get = array_filter($_GET);
                 $split_m2m = split_m2m($m2m, $clean_get);
                 $no_m2m = $split_m2m[0]; // Daten ohne Relationen
                 $m2m_rel = $split_m2m[1]; // Nur die Relationen // Variabeln fuer Prepared-Statements, z.B. :name oder :name_latin als Array
-
+                
                 $query = prepare_query($clean_get);
                 $bound = $query[1];
                 $query = $query[0];
-
+                
                 $stmt = $dbHandler->prepare($query);
                 $stmt->execute($bound);
                 $result = $stmt->fetchAll();
-
+                
                 echo $query;
-
+                
             }
 
-
+            
             $family_keys = get_values_from_db($dbHandler, 'family'); // family Werte abfragen (FK)
             $breeding_place_keys = get_values_from_db($dbHandler, 'breeding_place'); // breeding_place Werte abfragen (FK)
 
             $color_keys = get_values_from_db($dbHandler, 'color'); // color Werte abfragen (M2M)
             $food_keys = get_values_from_db($dbHandler, 'food'); // food Werte abfragen (M2M)
             $habitat_keys = get_values_from_db($dbHandler, 'habitat'); // habitat Werte abfragen (M2M)
-
+            
 
             ?>
             <table border="0">
@@ -152,7 +152,8 @@
             <td><label for='min_life_expectancy'>Lebenserwartung: </label></td><td><input type='number' id='min_life_expectancy' name='min_life_expectancy' <?php echo form_value($_GET, 'min_life_expectancy', 'text'); ?>></td><td> bis </td><td><input type="number" id="max_life_expectancy" name="max_life_expectancy" <?php echo form_value($_GET, 'max_life_expectancy', 'text'); ?>></td>
             </tr><tr>
             <td><label for='min_breeding_duration'>Brutdauer: </label></td><td><input type='number' id='min_breeding_duration' name='min_breeding_duration' <?php echo form_value($_GET, 'min_breeding_duration', 'text'); ?>></td><td> bis </td><td><input type="number" id="max_breeding_duration" name="max_breeding_duration" <?php echo form_value($_GET, 'max_breeding_duration', 'text'); ?>></td>
-            <!--<p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($_GET, 'min_livestock', 'checkbox'); ?>></p>-->
+             <!--<p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($_GET, 'min_livestock', 'checkbox'); ?>></p>-->
+            
             </tr>
             <?php
                 // Foreign Key Widgets rendern, also die <select> Dinger, siehe render Funktion. Erstes Argument ist die Datei, die das Template enthaelt
@@ -161,30 +162,29 @@
                     'name' => 'family_idfamily', 'verbose_name' => 'Familie',
                     'array' => $family_keys, 'fk_id' => 'idfamily', 'fk_name' => 'name',
                     'multiple' => ''));
-
+                
                 echo $renderer->render('widgets/foreign_key.html', array('id' => 'breeding_place',
                     'name' => 'breeding_place_idbreeding_place', 'verbose_name' => 'Brutort',
                     'array' => $breeding_place_keys, 'fk_id' => 'idbreeding_place', 'fk_name' => 'name',
                     'multiple' => ''));
-
+                
                 // M2M Widgets rendern, <select multiple>
                 echo $renderer->render('widgets/foreign_key.html', array('id' => 'bird_has_color',
                     'name' => 'bird_has_color[]', 'verbose_name' => 'Farbe',
                     'array' => $color_keys, 'fk_id' => 'idcolor', 'fk_name' => 'color_name',
                     'multiple' => 'multiple'));
-
+                
                 echo $renderer->render('widgets/foreign_key.html', array('id' => 'bird_has_food',
                     'name' => 'bird_has_food[]', 'verbose_name' => 'Nahrung',
                     'array' => $food_keys, 'fk_id' => 'idfood', 'fk_name' => 'name',
                     'multiple' => 'multiple'));
-
+                
                 echo $renderer->render('widgets/foreign_key.html', array('id' => 'bird_has_habitat',
                     'name' => 'bird_has_habitat[]', 'verbose_name' => 'Habitat',
                     'array' => $habitat_keys, 'fk_id' => 'idhabitat', 'fk_name' => 'name',
                     'multiple' => 'multiple'));
-
+                
             ?>
-
            <tr>
             <td><label for='description'>Beschreibung: </label></td><td><textarea id='description' name='description'><?php echo form_value($_GET, 'description', 'textarea'); ?></textarea></td>
             </tr><tr>
@@ -196,27 +196,25 @@
             </table>
         </form>
         <br>
-    <h2>Suchergebnisse: </h2>
-    <div id="result">
-    <ul>
-        <?php
-            if(isset($result)) {
-                $i = count($result);
-                if ($i = 1) {
-                    echo ''.$i.' Ergebnis gefunden <br><br>';
+        <h2>Suchergebnisse: </h2>
+        <div id="result">
+        <ul>
+            <?php
+                if(isset($result)) {
+                    $i = count($result);
+                    if ($i = 1) {
+                        echo ''.$i.' Ergebnis gefunden <br><br>';
+                    }
+                    else {
+                        echo ''.$i.' Ergebnisse gefunden <br><br>';
+                    }
+                    foreach($result as $object) {
+                        echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].', <i>'.$object['name_latin'].'</i></a></li>';
+                    }
                 }
-
-                else {
-                    echo ''.$i.' Ergebnisse gefunden <br><br>';
-                }
-
-                foreach($result as $object) {
-                    echo '<li><a href="/vogelpedia/detail.php?pk='.$object['idbird'].'">'.$object['name'].', <i>'.$object['name_latin'].'</i></a></li>';
-                }
-            }
-        ?>
-    </ul>
-    </div>
+            ?>
+        </ul>
+        </div>
 <br>
 <br>
 <br>

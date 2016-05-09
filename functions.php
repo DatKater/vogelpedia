@@ -41,6 +41,17 @@ function get_single_value_from_db($handler, $table, $value) {
     return $keys; // Rueckgabe
 }
 
+        
+function get_object_by_col($handler, $table, $col, $val) {
+    $query = sprintf("SELECT * FROM %s WHERE %s=:val;", $table, $col);
+    $stmt = $handler->prepare($query);
+    $stmt->bindParam(':val', $val);
+    $stmt->execute();
+    $obj_ = $stmt->fetchAll()[0];
+    $stmt->closeCursor();
+    return $obj_;
+}
+
 
 // Erstellt <option> Argumente fuer die FK/M2M-Widgets
 function print_select_options($array, $id, $name) {
@@ -150,7 +161,11 @@ function get_fk_query($params, $var) {
     return($queries);
 }
 
-function print_object($array, $key, $str) {
+function print_object($array, $key, $str){
+    return $array[$key][$str];
+}
+
+function print_objects($array, $key, $str) {
     $vals = array();
     foreach($array[$key] as $obj) {
         array_push($vals, $obj[$str]);

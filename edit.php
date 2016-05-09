@@ -71,6 +71,7 @@ print_r($object);
     <p><label for='breeding_duration'>Brutdauer:</label><input type='number' id='breeding_duration' name='breeding_duration' <?php echo form_value($object, 'breeding_duration', 'text'); ?>></p>
     <p><label for='red_list'>Rote Liste:</label><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($object, 'red_list', 'checkbox'); ?>></p>
     
+    <p><label for='description'>Beschreibung:</label><textarea id='description' name='description'><?php echo form_value($object, 'description', 'textarea'); ?></textarea></p>
     <p><input type='submit' value='Absenden'><input type='reset' value='Zurücksetzen'></p>
     </form>
     
