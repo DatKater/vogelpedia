@@ -159,6 +159,7 @@ table .button {
     border: 0px;
     font-size: 14px;
     background-color:  #00cc00;
+    margin-right: 10px;
 }
 
 table .button:hover {
@@ -195,3 +196,11 @@ table .button:hover {
 #result li a:hover {
    font-weight: bold;
 }
+
+.checkbox {
+   margin-left: 5px;
+   width: 5px;
+   float: left;
+
+}
+
