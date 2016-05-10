@@ -6,6 +6,7 @@
     
     <div id="main">
     <div id="inhalt">
+        <a id="export" href="/vogelpedia/export.php?pk=<?php echo $_GET['pk'] ?>">In .csv exportieren</a>
     <a id="bearbeiten" href="/vogelpedia/edit.php?pk=<?php echo $_GET['pk'] ?>">Eintrag bearbeiten</a>
     <link href="/vogelpedia/css/styles.css" rel="stylesheet">
     <?php 
