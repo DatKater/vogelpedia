@@ -47,7 +47,7 @@ function get_object_by_col($handler, $table, $col, $val) {
     $stmt = $handler->prepare($query);
     $stmt->bindParam(':val', $val);
     $stmt->execute();
-    $obj_ = $stmt->fetchAll()[0];
+    $obj_ = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
     $stmt->closeCursor();
     return $obj_;
 }
@@ -171,5 +171,22 @@ function print_objects($array, $key, $str) {
         array_push($vals, $obj[$str]);
     }
     return join($vals, ', ');
+}
+
+function download_send_headers($filename) { // http://stackoverflow.com/questions/4249432/export-to-csv-via-php (10.05.16; 08:03)
+    // disable caching
+    $now = gmdate("D, d M Y H:i:s");
+    header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+    header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+    header("Last-Modified: {$now} GMT");
+
+    // force download  
+    header("Content-Type: application/force-download");
+    header("Content-Type: application/octet-stream");
+    header("Content-Type: application/download");
+
+    // disposition / encoding on response body
+    header("Content-Disposition: attachment;filename={$filename}");
+    header("Content-Transfer-Encoding: binary");
 }
 ?>

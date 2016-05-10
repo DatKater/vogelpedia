@@ -92,6 +92,8 @@
             </tr><tr>
             <td><label for='breeding_duration'>Brutdauer:</label></td><td><input type='number' id='breeding_duration' name='breeding_duration'></td>
             </tr><tr>
+                <td><label for='image_path'>Bild (URL)</label></td><td><input type='url' id='image_path' name='image_path'></td>
+            </tr><tr>
             <td><label for='red_list'>Rote Liste:</label></td><td><input type='checkbox' class="checkbox" id='red_list' name='red_list'></td>
             </tr>
 
