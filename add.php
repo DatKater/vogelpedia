@@ -14,19 +14,19 @@
                 require_once('settings/object.php');
                 require_once('functions.php');
                 require_once('renderer/object.php');
-
+                $post = array_filter($_POST);
                 $dbHandler = get_handler(); // PDO, siehe functions.php
                 $renderer = new TemplateRenderer(); // Template Renderer, siehe renderer/objects.php
 
-                if(isset($_POST['debug'])) { // Wenn Debug angewaehlt
-                    $debug = $_POST['debug']; // $debug ist gesetzt
-                    unset($_POST['debug']); // Aus POST entfernen
+                if(isset($post['debug'])) { // Wenn Debug angewaehlt
+                    $debug = $post['debug']; // $debug ist gesetzt
+                    unset($post['debug']); // Aus POST entfernen
                 } else {
                     $debug = NULL; // Ansonsten ist Debug nicht gesetzt
                 }
 
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Wenn POST, Formular also gesendet
-                    $split_m2m = split_m2m($m2m, $_POST); // M2M Relationen von POST trennen
+                    $split_m2m = split_m2m($m2m, $post); // M2M Relationen von POST trennen
                     $no_m2m = $split_m2m[0]; // Daten ohne Relationen
                     $m2m_rel = $split_m2m[1]; // Nur die Relationen // Variabeln fuer Prepared-Statements, z.B. :name oder :name_latin als Array
 
@@ -52,6 +52,9 @@
                         $stmt->closeCursor(); // Statement schliessen
                         echo '<br> ID',$id,'</br>';
                         handle_m2m($m2m_rel, $id, $dbHandler); // M2M-Relationen verarbeiten
+                        
+                        header("Location: /vogelpedia/index.php");
+                        die();
 
                     } else { // Wenn Debug aktiv ist, werden relevante Infos zum Debuggen ausgegeben
                         print_r($query);
@@ -59,17 +62,17 @@
                         print_r($no_m2m);
                         print_r($m2m_rel);
                         print_r($_POST);
+                        print_r($post);
                         echo '</pre>';
 
                     }
-                } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') { // Wenn GET, also das Formular angefordert wird
-                    $family_keys = get_values_from_db($dbHandler, 'family'); // family Werte abfragen (FK)
-                    $breeding_place_keys = get_values_from_db($dbHandler, 'breeding_place'); // breeding_place Werte abfragen (FK)
-
-                    $color_keys = get_values_from_db($dbHandler, 'color'); // color Werte abfragen (M2M)
-                    $food_keys = get_values_from_db($dbHandler, 'food'); // food Werte abfragen (M2M)
-                    $habitat_keys = get_values_from_db($dbHandler, 'habitat'); // habitat Werte abfragen (M2M)
                 }
+                $family_keys = get_values_from_db($dbHandler, 'family'); // family Werte abfragen (FK)
+                $breeding_place_keys = get_values_from_db($dbHandler, 'breeding_place'); // breeding_place Werte abfragen (FK)
+
+                $color_keys = get_values_from_db($dbHandler, 'color'); // color Werte abfragen (M2M)
+                $food_keys = get_values_from_db($dbHandler, 'food'); // food Werte abfragen (M2M)
+                $habitat_keys = get_values_from_db($dbHandler, 'habitat'); // habitat Werte abfragen (M2M)
 
             ?>
 
@@ -92,7 +95,7 @@
             </tr><tr>
             <td><label for='breeding_duration'>Brutdauer:</label></td><td><input type='number' id='breeding_duration' name='breeding_duration'></td>
             </tr><tr>
-                <td><label for='image_path'>Bild (URL)</label></td><td><input type='url' id='image_path' name='image_path'></td>
+            <td><label for='image_path'>Bild (URL)</label></td><td><input type='url' id='image_path' name='image_path'></td>
             </tr><tr>
             <td><label for='red_list'>Rote Liste:</label></td><td><input type='checkbox' class="checkbox" id='red_list' name='red_list'></td>
             </tr>

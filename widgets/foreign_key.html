@@ -2,6 +2,7 @@
 <td>
 <label for='{ id }'>{ verbose_name }</label> </td><td>
 <select id='{ id }' name='{ name }' { multiple }>
+    <option value> -- Wähle weise -- </option>
     {% print_select_options array fk_id fk_name %}
 </select>
 </td>

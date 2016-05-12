@@ -7,13 +7,14 @@ require_once('renderer/object.php');
 require_once('functions.php');
 
 is_404(!isset($_GET['pk'])); // Wenn pk nicht gesetzt ist, 404
+$post = array_filter($_POST);
 
 $pk = $_GET['pk'];
 $dbHandler = get_handler(); // PDO
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $query = 'UPDATE bird SET %s WHERE idbird=:pk;'; // UPDATE bird SET name=:name WHERE idbird=12;
-    $split_m2m = split_m2m($m2m, array_filter($_POST)); // M2M Relationen von POST trennen
+    $split_m2m = split_m2m($m2m, array_filter($post)); // M2M Relationen von POST trennen
     $no_m2m = $split_m2m[0]; // Daten ohne Relationen
     $m2m_rel = $split_m2m[1]; // Nur die Relationen // Variabeln fuer Prepared-Statements, z.B. :name oder :name_latin als Array
 
@@ -34,9 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $query = sprintf($query, $bound); // Query zusammenfügen
     $bound_variables[':pk'] = $pk; // pk zu den Daten hinzufuegen
     $stmt = $dbHandler->prepare($query);
-    print_r($bound_variables);
     $stmt->execute($bound_variables);
     $stmt->closeCursor();
+    
+    header("Location: /vogelpedia/detail.php?pk=$pk");
+    die();
 }
 
 $query = 'SELECT * FROM bird WHERE idbird = :pk;'; // SELECT * FROM bird WHERE idbird = 12;
@@ -56,7 +59,6 @@ if(isset($object['red_list'])) {
     }
 }
 
-print_r($object);
 ?>
     <?php include 'parts/header.php' ?>
     <div id="main">
@@ -84,6 +86,8 @@ print_r($object);
     <td><label for='life_expectancy'>Lebenserwartung:</label></td><td><input type='number' id='life_expectancy' name='life_expectancy' <?php echo form_value($object, 'life_expectancy', 'text'); ?>></td>
     </tr><tr>
     <td><label for='breeding_duration'>Brutdauer:</label></td><td><input type='number' id='breeding_duration' name='breeding_duration' <?php echo form_value($object, 'breeding_duration', 'text'); ?>></td>
+    </tr><tr>
+    <td><label for='image_path'>Bild (URL)</label></td><td><input type='url' id='image_path' name='image_path' <?php echo form_value($object, 'image_path', 'text'); ?>></td>
     </tr><tr>
     <td><label for='red_list'>Rote Liste:</label></td><td><input type='checkbox' id='red_list' name='red_list' <?php echo form_value($object, 'red_list', 'checkbox'); ?>></td>
     </tr><tr>
