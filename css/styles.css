@@ -208,4 +208,15 @@ textarea {
    height:200px;
 }
 
+.red_list_1:before {
+    content: '✔';
+    color: #cc0000;
+    padding-left: 10px;
+}
 
+.red_list_0:before {
+    content: '❌';
+    color: #006600;
+    padding-left: 10px;
+    
+}

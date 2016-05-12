@@ -9,7 +9,7 @@
 <p><b>Nahrung:</b> {% print_objects relations food name %}</p>
 <p><b>Brutort:</b> {% print_object relations breeding_place name %} Beschreibung wenn dar&uuml;ber f&auml;hrt </p>
 <p><b>Brutdauer:</b> {object.breeding_duration} Tage</p>
-<p><b>Rote Liste:</b> {object.red_list}</p>
+<p><b>Rote Liste:</b><span class="red_list_{object.red_list}"></span></p>
 <p><b>L&auml;nge:</b> {object.min_length}-{object.max_length} cm</p>
 <p><b>Spannweite:</b> {object.min_wingspread}-{object.max_wingspread} cm</p>
 <p><b>Gewicht:</b> {object.min_weight}-{object.max_weight} g</p>
