@@ -12,7 +12,6 @@
 
         require_once 'settings/object.php';
         require_once 'renderer/object.php';
-        require_once '/db_access/models.php';
         require_once 'functions.php';
 
         $query = 'SELECT * FROM bird;';
