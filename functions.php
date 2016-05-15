@@ -98,6 +98,7 @@ function handle_m2m($m2m, $id, $handler) {
 }
 
 // Formatiert den Wert fuer den entsprechenden <input>, wenn er im array vorhanden ist
+// http://raymondmoul.com/auto-fill-form-values-submission/ (abgeaendert)
 function form_value($array, $name, $type='text', $select_value = ''){ // 
 
    if(isset($array[$name])){
