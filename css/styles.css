@@ -122,8 +122,9 @@ body {
    font-size: 24px;
 }
 
-#bearbeiten {
+.top_link {
    margin-top: 30px;
+   margin-left: 5px;
    color: #ffffff;
    font-weight: bold;
    background-color: #00cc00;

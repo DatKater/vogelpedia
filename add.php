@@ -14,7 +14,7 @@
                 require_once('settings/object.php');
                 require_once('functions.php');
                 require_once('renderer/object.php');
-                $post = array_filter($_POST);
+                $post = array_filter($_POST); // leere Keys entfernen
                 $dbHandler = get_handler(); // PDO, siehe functions.php
                 $renderer = new TemplateRenderer(); // Template Renderer, siehe renderer/objects.php
 
@@ -35,12 +35,6 @@
                     $bound = join(', ', array_keys($bound_variables)); // Prepared Statements zu String zusammenfassen, damit sie eingefuegt werden koennen
                     $columns = join(', ', array_keys($no_m2m)); //
 
-                    echo '<pre>Bound:';
-                    print_r($bound_variables);
-                    echo '<br>';
-                    print_r($no_m2m);
-                    echo '</pre>';
-
                     // SQL Statement mit Prepared Statements, $columns enthaelt alle Spalten, die per POST angekommen sind, $bound die prepared Statements als String
                     $query = sprintf('INSERT INTO bird (%s) VALUES (%s);', $columns, $bound);
 
@@ -50,10 +44,9 @@
 
                         $id = $dbHandler->lastInsertId(); // Die ID des letzten Inserts erhalten (also die des Vogels, der grade hinzugefuegt wurde)
                         $stmt->closeCursor(); // Statement schliessen
-                        echo '<br> ID',$id,'</br>';
                         handle_m2m($m2m_rel, $id, $dbHandler); // M2M-Relationen verarbeiten
                         
-                        header("Location: /vogelpedia/index.php");
+                        header("Location: /vogelpedia/detail.php?pk=$id"); // Zum Steckbrief weiterleiten
                         die();
 
                     } else { // Wenn Debug aktiv ist, werden relevante Infos zum Debuggen ausgegeben

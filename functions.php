@@ -42,8 +42,8 @@ function get_single_value_from_db($handler, $table, $value) {
 }
 
         
-function get_object_by_col($handler, $table, $col, $val) {
-    $query = sprintf("SELECT * FROM %s WHERE %s=:val;", $table, $col);
+function get_object_by_col($handler, $table, $col, $val) { // Objekt nach Spalte aus der DB abfragen
+    $query = sprintf("SELECT * FROM %s WHERE %s=:val;", $table, $col); // SELECT * FROM bird WHERE pk=12;
     $stmt = $handler->prepare($query);
     $stmt->bindParam(':val', $val);
     $stmt->execute();
@@ -97,7 +97,8 @@ function handle_m2m($m2m, $id, $handler) {
     }
 }
 
-function form_value($array, $name, $type='text', $select_value = ''){
+// Formatiert den Wert fuer den entsprechenden <input>, wenn er im array vorhanden ist
+function form_value($array, $name, $type='text', $select_value = ''){ // 
 
    if(isset($array[$name])){
 
@@ -139,7 +140,7 @@ function form_value($array, $name, $type='text', $select_value = ''){
    return '';
 }
 
-function is_404($condition) {
+function is_404($condition) { // Prueft auf 404, wenn gegeben wird der Header geaendert und das 404 eingebunden, sowie der Code unterbrochen
     if($condition) {
         header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);
         include 'parts/404.html';
@@ -147,30 +148,21 @@ function is_404($condition) {
     }
 }
 
-function get_fk_query($params, $var) {
-    $queries = array();
+function get_fk_query($params, $var) { // Produziert die Queries fuer M2M, gibt das Objekt zurueck. z.B. alle Farben eines Vogels.
+    $queries = array(); 
     foreach($params as $key => $param){
+        
+        // SELECT color.* FROM color, bird, bird_has_color WHERE color.idcolor = bird_has_color.color_idcolor AND bird.idbird = bird_has_color.bird_idbird AND bird.idbird = 12;
         $query = sprintf('SELECT %1$s.* FROM %1$s, %3$s, %5$s WHERE %1$s.%2$s = %5$s.%6$s AND %3$s.%4$s = %5$s.%7$s AND %3$s.%4$s = %8$s;',
                 $param['table']['name'], $param['table']['id'],
                 $param['table_fk']['name'], $param['table_fk']['id'],
                 $param['table_m2m']['name'], $param['table_m2m']['id_t'],
                 $param['table_m2m']['id_f'], $var);
+        
         $queries[$key] = $query;
     }
 
     return($queries);
-}
-
-function print_object($array, $key, $str){
-    return $array[$key][$str];
-}
-
-function print_objects($array, $key, $str) {
-    $vals = array();
-    foreach($array[$key] as $obj) {
-        array_push($vals, $obj[$str]);
-    }
-    return join($vals, ', ');
 }
 
 function download_send_headers($filename) { // http://stackoverflow.com/questions/4249432/export-to-csv-via-php (10.05.16; 08:03)
@@ -188,5 +180,19 @@ function download_send_headers($filename) { // http://stackoverflow.com/question
     // disposition / encoding on response body
     header("Content-Disposition: attachment;filename={$filename}");
     header("Content-Transfer-Encoding: binary");
+}
+
+// Einfache Funktionen die im Template gebraucht um gewisse Funktionalitaet bereitzustellen, die der Renderer nicht bietet
+
+function print_object($array, $key, $str){ // Ein einzelnes Objekt aus einem Array extrahieren und durch einen Key anzeigen
+    return $array[$key][$str];
+}
+
+function print_objects($array, $key, $str) { // Ein Array mit Objekten durch einen gemeinsamen Key repraesentieren und eine Liste zurueckgeben
+    $vals = array();
+    foreach($array[$key] as $obj) {
+        array_push($vals, $obj[$str]);
+    }
+    return join($vals, ', ');
 }
 ?>

@@ -6,23 +6,23 @@ class TemplateRenderer {
     
     private $left_delimiter = '{'; // Beschraenkung des Platzhalters links
     private $right_delimiter = '}'; // Beschraenkung des Platzhalters rechts
-    private $function_marker = '%';
-    private $function_regex = '\s?(?<name>[a-zA-Z_]+)\s(?<params>(([\w\d]+) )*)\s?';
+    private $function_marker = '%'; // markiert einen Platzhalter als Funktion
+    private $function_regex = '\s?(?<name>[a-zA-Z_]+)\s(?<params>(([\w\d]+) )*)\s?'; // RegEx um eine Funktion zu erkennen
     
     public function render($template, $context) {
         $file = file_get_contents($template); // Das Template als String laden
         // Durch den Kontext, der $key ist der Name des Platzhalters, $value der Wert, durch den er ersetzt wird
         foreach($context as $key => $value) {
-            if(!is_array($value)){
+            if(!is_array($value)){ // Wenn der ersetzte Wert kein Array ist
                 $pattern = $this->left_delimiter.'(\s)?'.$key.'(\s)?'. $this->right_delimiter; // RegEx, z.B.: {(\s)?name(\s)?} --> {name} bzw. { name }
                 $file = mb_ereg_replace($pattern, $value, $file); // RegEx-Suche, alle Platzhalter durch den jeweiligen Wert ersetzen
-            } else {
-                $pattern = '('.$this->left_delimiter.'(\s)?(?P<name>'.$key.')\.(?P<value>[\w]+)(\s)?'.$this->right_delimiter.')';
-                $matches = array();
-                preg_match_all($pattern, $file, $matches, PREG_SET_ORDER);
-                foreach($matches as $match) {
-                    $key = $match['value'];
-                    $file = mb_ereg_replace($match[0], $value[$key], $file);
+            } else { // Wenn der Wert ein Array ist, muessen die Keys des Arrays einzeln aufgerufen werden
+                $pattern = '('.$this->left_delimiter.'(\s)?(?P<name>'.$key.')\.(?P<value>[\w]+)(\s)?'.$this->right_delimiter.')'; // Findet z.B. { object.name }
+                $matches = array(); // Ein Array für alle Treffer
+                preg_match_all($pattern, $file, $matches, PREG_SET_ORDER); // RegEx Abgleich, Treffer in das Array schreiben, nach Treffern gruppieren
+                foreach($matches as $match) { // Jeder Treffer
+                    $key = $match['value']; // Den Key aus dem Treffer extrahieren, dieser wurde in die Gruppe value geschrieben
+                    $file = mb_ereg_replace($match[0], $value[$key], $file); // Den Treffer ersetzen, der erste Eintrag des Treffers enthaelt den RegEx Ausdruck
                 }
             }
         }

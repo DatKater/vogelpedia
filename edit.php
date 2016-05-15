@@ -7,12 +7,12 @@ require_once('renderer/object.php');
 require_once('functions.php');
 
 is_404(!isset($_GET['pk'])); // Wenn pk nicht gesetzt ist, 404
-$post = array_filter($_POST);
+$post = array_filter($_POST); // Leere Keys entfernen
 
 $pk = $_GET['pk'];
 $dbHandler = get_handler(); // PDO
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Wenn POST werden die Aenderungen gespeichert und anschliessend weitergeleitet
     $query = 'UPDATE bird SET %s WHERE idbird=:pk;'; // UPDATE bird SET name=:name WHERE idbird=12;
     $split_m2m = split_m2m($m2m, array_filter($post)); // M2M Relationen von POST trennen
     $no_m2m = $split_m2m[0]; // Daten ohne Relationen
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute($bound_variables);
     $stmt->closeCursor();
     
-    header("Location: /vogelpedia/detail.php?pk=$pk");
+    header("Location: /vogelpedia/detail.php?pk=$pk"); // Zum Steckbrief weiterleiten
     die();
 }
 
