@@ -13,43 +13,45 @@ and open the template in the editor.
 }
 
 body {
-     background: url(../background.jpg) no-repeat center center fixed;
-     -webkit-background-size: cover;
+     background: url(../background.jpg) no-repeat center center fixed; /*Hintergundbild fix */
+     -webkit-background-size: cover;                                  /*Hintergundbild f¸r alle verschiednen Browser */
      -moz-background-size: cover;
      -o-background-size: cover;
      background-size: cover;
-     padding:0px;
+     padding:0px;                                                   /*Innen- und Aussenabstand auf 0, weil sonst automatisch kleiner Rand entsteht */
      margin: 0px;
      height: 100%;
 }
 
-#header{
+/* NAVIGATION */
+
+#header{                          /* <div> das die ganze Navigation enth‰lt -> fix, damit auch bei herunterscrollen noch da */
     background-color: #ccccb3;
     position: fixed;
     top: 0;
-    z-index: 999;
+    z-index: 999;                /*zuoberst in "Ebene" damit sieht */
     width:100%;
     height: 60px;
     margin:0;
     padding: 0;
 }
 
-.nav {
-    list-style-type: none;
+.nav {                        /*<ul> tags in der die Liste enthalten ist*/
+    list-style-type: none;     /* Keine Aufz‰hlungspunkte */
     overflow: hidden;
     margin-top: 0px;
 }
 
 
 
-.nav li{
+.nav li{                 /*Aufz‰hlungspunkte*/
     top: 0;
-    display: inline;
+    display: inline;      /*nebeneinander angeordnet, da Navigation horizontal ist*/
     float: left;
     height: 100%;
 }
 
-.nav a{
+.nav a{             /*Link in <li> tags -> Buttons*/
     top:0;
     display: block;
     padding: 15px;
@@ -61,27 +63,31 @@ body {
     font-size: 20px;
 }
 
-.nav a:hover{
+.nav a:hover{        /*Wenn mit Maus ¸ber Button in Navigation f‰hrt */
     background-color: #adad85;
 }
 
-#search {
+#search {            /* <li> in dem Suchfeld & Submmit Knopf drin sind -> Spezialfall*/
     width: 300px;
     display: block;
     margin: 0;
     font-size: 20px;
 }
 
-#searchbar {
+#searchbar {           /* Suchfeld <input> */
     margin-top: 5px;
     height: 50px;
     appearance: none;
     padding: 10px;
     border: solid 1px #fff;
-    box-shadow: inset 2px 2px 3px 0 #c9c9c9;
+    box-shadow: inset 2px 2px 3px 0 #c9c9c9;  /* Suchfeld Schatten */
 }
 
-#submit {
+#searchbar:focus {     /* Wenn auf Suchfeld drauf klickt*/
+    box-shadow: inset 1px 1px 2px 0 #c9c9c9;
+}
+
+#submit {      /* Submit Button in Navigation */
     margin-top: 5px;
     height: 50px;
     border: 0px;
@@ -91,38 +97,38 @@ body {
 
 }
 
-#searchbar:focus {
-    box-shadow: inset 1px 1px 2px 0 #c9c9c9;
-}
-
-#submit:hover {
+#submit:hover {   /* Wenn ¸ber Submit Button dr¸ber f‰hrt mit Maus */
      background-color:  #edede4;
 }
 
-#main {
+
+/* SEITENINHALT */
+
+#main {         /* Der Teil der Seite in der der Hauptteil steht: Er f¸llt nur 60% der Bildschirmbreite und ist Transparent*/
    margin-top: 60px;
    margin-bottom: 0px;
    width: 60%;
    margin-left:20%;
    background-color: white;
-   background: rgba(255,255,255,.6);
+   background: rgba(255,255,255,.6);      /* opacity = 0.6 -> Transparent */
 }
 
-#inhalt {
+#inhalt {                 /* <div> innerhalb von #main, in #inhalt ist der Text und die Bilder enthalten. Er hat einen Abstand links und rechts von 5 % damit der Inhalt niht am Rand klebt */
    margin-left: 5%;
    margin-right: 5%;
 }
 
-#vogelname {
-   font-size: 36px;
+/* STECKBRIEF */
 
+#vogelname {    /* Vogelname gross -> Titel */
+   font-size: 36px;
 }
 
-#latin {
+#latin {        /* lateinischer Name neben #vogelname kleiner geschrieben */
    font-size: 24px;
 }
 
-.top_link {
+.top_link {        /* Buttons um in CSV zu exportieren oder Eintrag zu bearbeiten */
    margin-top: 30px;
    margin-left: 5px;
    color: #ffffff;
@@ -133,26 +139,41 @@ body {
    padding: 10px;
 }
 
-#bearbeiten:hover {
+.top_link:hover {     /* Wenn ¸ber .top_link button f‰hrt mit Maus */
    background-color:  #00b300;
 }
 
-table {
+.red_list_1:before {     /* Anstatt einer 1 (Bei Rote Liste) zeigt es ein H‰ckchen an */
+    content: '‚úî';
+    color: #cc0000;
+    padding-left: 10px;
+}
+
+.red_list_0:before {      /* Anstatt einer 0 (Bei Rote Liste) zeigt es ein Kreuz an */
+    content: '‚ùå';
+    color: #006600;
+    padding-left: 10px;
+
+}
+
+/* FORMULAR DESIGN f‹R SUCHE, HINZUF‹GEN UND BEARBEITEN */
+
+table {  /* Formular angeordnet in Tabelle */
    width: 100%;
    border: 1px dashed;
    padding: 5px;
 
 }
 
-table input, textarea, select {
+table input, textarea, select {   /* Eingabefelder 90% Breite */
    width: 90%;
 }
 
-td {
+td {          /* Zelle innenabstand */
    padding: 5px;
 }
 
-table .button {
+table .button {       /* Buttons am Ende des Formulars zum Absenden */
     color: white;
     font-weight: bold;
     height: 50px;
@@ -163,28 +184,41 @@ table .button {
     margin-right: 10px;
 }
 
-table .button:hover {
+table .button:hover {       /* Wenn ¸ber Absenden Knopf am Ende des Formulars f‰hrt mmit Maus */
    background-color:  #00b300;
 }
 
-#result ul {
+.checkbox {     /* Postitionierung der Checkbox f¸r die Rote Liste */
+   margin-left: 5px;
+   width: 5px;
+   float: left;
+
+}
+
+textarea {       /* Eingabefeld f¸r Beschreibung muss grˆsser sein, da viel Inhalt */
+   height:200px;
+}
+
+/* SUCHERGEBNISSE */
+
+#result ul {   /* Liste der Resultate */
    margin: 0;
    margin-right: 5%;
    padding: 0;
 }
 
-#result li {
+#result li {      /* Einzelnes Resultat als Listenelement, ohne Aufz‰hlungszeichen, oberhalb gepunktete Linie */
    padding: 10px;
    list-style: none;
    color: black;
    width: 100%;
    margin: 0;
    border-top: 1px dashed black;
-   
+
 
 }
 
-#result li a {
+#result li a {      /* Link in <li> tag breiter machen, damit ganzes Feld anklickbar */
    padding: 10px;
    padding-right: 60%;
    margin-right: 0px;
@@ -194,30 +228,8 @@ table .button:hover {
    color: black;
 }
 
-#result li a:hover {
+#result li a:hover {     /* Wenn ¸ber Link f‰hrt mit Maus */
    font-weight: bold;
 }
 
-.checkbox {
-   margin-left: 5px;
-   width: 5px;
-   float: left;
 
-}
-
-textarea {
-   height:200px;
-}
-
-.red_list_1:before {
-    content: '‚úî';
-    color: #cc0000;
-    padding-left: 10px;
-}
-
-.red_list_0:before {
-    content: '‚ùå';
-    color: #006600;
-    padding-left: 10px;
-    
-}
